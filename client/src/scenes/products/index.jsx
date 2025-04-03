@@ -1,164 +1,81 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  Collapse,
-  Button,
-  Typography,
-  Rating,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-import { useGetProductsQuery } from "state/api";
-import { Header } from "components";
+function Product() {
+  const [backlog, setBacklog] = useState([]);
+  const [error, setError] = useState(null);
+  const [authenticated, setAuthenticated] = useState(false); // Track if the user is authenticated
 
-// Product
-const Product = ({
-  _id,
-  name,
-  description,
-  price,
-  rating,
-  category,
-  supply,
-  stat,
-}) => {
-  // theme
-  const theme = useTheme();
-  // is expanded
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Check if the user is authenticated when the component mounts
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/auth/check-auth', { withCredentials: true });
+        setAuthenticated(response.data.authenticated);  // Update authenticated state
+      } catch (err) {
+        console.error('Error checking authentication:', err);
+        setAuthenticated(false);  // Default to not authenticated
+      }
+    };
 
-  return (
-    <Card
-      sx={{
-        backgroundImage: "none",
-        backgroundColor: theme.palette.background.alt,
-        borderRadius: "0.55rem",
-      }}
-    >
-      {/* Content */}
-      <CardContent>
-        {/* Category */}
-        <Typography
-          sx={{ fontSize: 14 }}
-          color={theme.palette.secondary[700]}
-          gutterBottom
-        >
-          {category}
-        </Typography>
+    checkAuthentication();
+  }, []); // Run only once when the component mounts
 
-        {/* Name */}
-        <Typography variant="h5" component="div">
-          {name}
-        </Typography>
+  useEffect(() => {
+    // Fetch the backlog data if the user is authenticated
+    if (authenticated) {
+      const fetchBacklog = async () => {
+        try {
+          const response = await axios.get('http://localhost:3000/api/backlog', { withCredentials: true });
+          setBacklog(response.data.issues);  // Assuming response.data is an array of issues
+        } catch (err) {
+          setError('Error fetching backlog');
+        }
+      };
 
-        {/* Price */}
-        <Typography sx={{ mb: "1.5rem" }} color={theme.palette.secondary[400]}>
-          ${Number(price).toFixed(2)}
-        </Typography>
+      fetchBacklog();
+    }
+  }, [authenticated]); // Trigger when authentication changes
 
-        {/* Rating */}
-        <Rating value={rating} readOnly />
+  // Redirect the user to the OAuth login URL
+  const handleLogin = () => {
+    window.location.href = 'http://localhost:3000/auth/atlassian';  // Redirect to your backend's OAuth route
+  };
 
-        {/* Description */}
-        <Typography variant="body2">{description}</Typography>
-      </CardContent>
-
-      {/* See More/See Less */}
-      <CardActions>
-        <Button
-          variant="primary"
-          size="small"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          {isExpanded ? "See Less" : "See More"}
-        </Button>
-      </CardActions>
-
-      {/* More Info */}
-      <Collapse
-        in={isExpanded}
-        timeout="auto"
-        unmountOnExit
-        sx={{ color: theme.palette.neutral[300] }}
-      >
-        <CardContent>
-          <Typography>id: {_id}</Typography>
-          <Typography>Supply Left: {supply}</Typography>
-          <Typography>
-            Yearly Sales This Year: {stat[0].yearlySalesTotal}
-          </Typography>
-          <Typography>
-            Yearly Units Sold This Year: {stat[0].yearlyTotalSoldUnits}
-          </Typography>
-        </CardContent>
-      </Collapse>
-    </Card>
-  );
-};
-
-// Products
-const Products = () => {
-  // get data
-  const { data, isLoading } = useGetProductsQuery();
-  // is medium/large desktop
-  const isNonMobile = useMediaQuery("(min-width: 1000px)");
+  // Handle logout functionality
+  const handleLogout = async () => {
+    try {
+      await axios.get('http://localhost:3000/auth/logout', { withCredentials: true });
+      setAuthenticated(false);  // Set authenticated to false after logging out
+      setBacklog([]);  // Clear the backlog data
+    } catch (err) {
+      console.error('Error logging out:', err);
+    }
+  };
 
   return (
-    <Box m="1.5rem 2.5rem">
-      {/* Header */}
-      <Header title="PRODUCTS" subtitle="See your list of products." />
+    <div className="App">
+      <h1>Product Backlog</h1>
 
-      {/* Content */}
-      {data || !isLoading ? (
-        <Box
-          mt="20px"
-          display="grid"
-          gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-          justifyContent="space-between"
-          rowGap="20px"
-          columnGap="1.33%"
-          sx={{
-            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-          }}
-        >
-          {/* Loop over each product */}
-          {data.map(
-            ({
-              _id,
-              name,
-              description,
-              price,
-              rating,
-              category,
-              supply,
-              stat,
-            }) => (
-              <Product
-                key={_id}
-                _id={_id}
-                name={name}
-                description={description}
-                price={price}
-                rating={rating}
-                category={category}
-                supply={supply}
-                stat={stat}
-              />
-            )
-          )}
-        </Box>
+      {/* Display login button if the user is not authenticated */}
+      {!authenticated ? (
+        <button onClick={handleLogin}>Login to JIRA</button>
       ) : (
-        // Loader
-        <Typography variant="h5" mt="20%" textAlign="center">
-          Loading...
-        </Typography>
+        <div>
+          <button onClick={handleLogout}>Logout</button> {/* Logout button */}
+          {error && <p>{error}</p>}
+          <ul>
+            {backlog.map(issue => (
+              <li key={issue.id}>
+                <h3>{issue.fields.summary}</h3>
+                <p>Priority: {issue.fields.priority.name}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-    </Box>
+    </div>
   );
-};
+}
 
-export default Products;
+export default Product;
