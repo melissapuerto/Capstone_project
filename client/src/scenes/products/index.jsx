@@ -10,7 +10,7 @@ function Product() {
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/auth/check-auth', { withCredentials: true });
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3000"}/auth/check-auth`, { withCredentials: true });
         setAuthenticated(response.data.authenticated);  // Update authenticated state
       } catch (err) {
         console.error('Error checking authentication:', err);
@@ -26,7 +26,7 @@ function Product() {
     if (authenticated) {
       const fetchBacklog = async () => {
         try {
-          const response = await axios.get('http://localhost:3000/api/backlog', { withCredentials: true });
+          const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3000"}/api/backlog`, { withCredentials: true });
           setBacklog(response.data.issues);  // Assuming response.data is an array of issues
         } catch (err) {
           setError('Error fetching backlog');
@@ -39,13 +39,13 @@ function Product() {
 
   // Redirect the user to the OAuth login URL
   const handleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/atlassian';  // Redirect to your backend's OAuth route
+    window.location.href = `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3000"}/auth/atlassian`;  // Redirect to your backend's OAuth route
   };
 
   // Handle logout functionality
   const handleLogout = async () => {
     try {
-      await axios.get('http://localhost:3000/auth/logout', { withCredentials: true });
+      await axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3000"}/auth/logout`, { withCredentials: true });
       setAuthenticated(false);  // Set authenticated to false after logging out
       setBacklog([]);  // Clear the backlog data
     } catch (err) {
