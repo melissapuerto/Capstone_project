@@ -28,6 +28,9 @@ import {
   AdminPanelSettingsOutlined,
   TrendingUpOutlined,
   PieChartOutlined,
+  NatureOutlined,
+  AssessmentOutlined,
+  SpeedOutlined,
 } from "@mui/icons-material";
 
 import { FlexBetween } from ".";
@@ -40,12 +43,12 @@ const navItems = [
     icon: <HomeOutlined />,
   },
   {
-    text: "Client Facing",
+    text: "Carbon Efficiency",
     icon: null,
   },
   {
     text: "Products",
-    icon: <ShoppingCartOutlined />,
+    icon: <NatureOutlined />,
   },
   {
     text: "Customers",
@@ -60,12 +63,12 @@ const navItems = [
     icon: <PublicOutlined />,
   },
   {
-    text: "Sales",
+    text: "Sustainability Efforts",
     icon: null,
   },
   {
     text: "Overview",
-    icon: <PointOfSaleOutlined />,
+    icon: <AssessmentOutlined />,
   },
   {
     text: "Daily",
@@ -80,7 +83,7 @@ const navItems = [
     icon: <PieChartOutlined />,
   },
   {
-    text: "Management",
+    text: "Performance",
     icon: null,
   },
   {
@@ -88,8 +91,8 @@ const navItems = [
     icon: <AdminPanelSettingsOutlined />,
   },
   {
-    text: "Performance",
-    icon: <TrendingUpOutlined />,
+    text: "Metrics",
+    icon: <SpeedOutlined />,
   },
 ];
 
@@ -150,9 +153,9 @@ const Sidebar = ({
                     sx={{
                       cursor: "pointer",
                     }}
-                    title="ECOMVISION"
+                    title="Sustainability Dashboard"
                   >
-                    ECOMVISION
+                    Sustainability Dashboard
                   </Typography>
                 </Box>
                 {/* Mobile Sidebar Toggle Icon */}
