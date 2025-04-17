@@ -37,8 +37,8 @@ router.get('/', async (req, res) => {
                 'Accept': 'application/json'
             },
             params: {
-                jql: 'project = "SCRUM" AND summary !~ "sustainability" AND summary !~ "refactoring" ORDER BY priority DESC',
-                fields: 'summary,priority,issuetype,customfield_10016,description,updated'
+                jql: 'project = "SCRUM" AND (summary ~ "sustainability" OR description ~ "sustainability" OR labels = "sustainability") ORDER BY priority DESC',
+                fields: 'summary,priority,issuetype,customfield_10016,description,updated,labels'
             }
         });
 
