@@ -12,12 +12,13 @@ import {
   Layout,
   Dashboard,
   Products,
-  Customers,
-  Transactions,
-  Geography,
+  CarbonFootprint,
+  EnergyEfficiency,
+  WaterConservation,
+  WasteManagement,
   Overview,
-  Daily,
-  Monthly,
+  DailyImpact,
+  MonthlyReport,
   Breakdown,
   Admin,
   Performance,
@@ -41,13 +42,14 @@ const App = () => {
             <Route element={<Layout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/geography" element={<Geography />} />
+              <Route path="/sustainability-backlog" element={<Products />} />
+              <Route path="/carbon-footprint" element={<CarbonFootprint />} />
+              <Route path="/energy-efficiency" element={<EnergyEfficiency />} />
+              <Route path="/water-conservation" element={<WaterConservation />} />
+              <Route path="/waste-management" element={<WasteManagement />} />
               <Route path="/overview" element={<Overview />} />
-              <Route path="/daily" element={<Daily />} />
-              <Route path="/monthly" element={<Monthly />} />
+              <Route path="/daily-impact" element={<DailyImpact />} />
+              <Route path="/monthly-report" element={<MonthlyReport />} />
               <Route path="/breakdown" element={<Breakdown />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/performance" element={<Performance />} />
