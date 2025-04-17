@@ -128,48 +128,63 @@ function SustainabilityBacklog() {
     storyPoints: '',
   });
 
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/backlog`, 
+        { withCredentials: true }
+      );
+      
+      if (!response.data || !response.data.issues) {
+        throw new Error('Invalid response format from server');
+      }
+
+      const issues = response.data.issues;
+      setBacklog(issues);
+      setError(null);
+      setApiError(false);
+    } catch (err) {
+      console.error('Error fetching backlog:', err.response?.data || err.message);
+      setError(err.response?.data?.error || err.response?.data?.details || 'Error fetching backlog');
+      setApiError(true);
+    }
+  };
+
   useEffect(() => {
-    const checkAuthentication = async () => {
+    const checkAuth = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/auth/check-auth`, { withCredentials: true });
-        setAuthenticated(response.data.authenticated);
-      } catch (err) {
-        console.error('Error checking authentication:', err);
-        setAuthenticated(false);
-        setApiError(true);
-      } finally {
-        setLoading(false);
+        const response = await fetch('http://localhost:3001/auth/check', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        setAuthenticated(data.authenticated);
+        if (!data.authenticated) {
+          // Store current URL before redirecting
+          const currentPath = window.location.pathname;
+          await fetch('http://localhost:3001/auth/store-url', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ returnTo: currentPath }),
+            credentials: 'include'
+          });
+          window.location.href = 'http://localhost:3001/auth/atlassian';
+        } else {
+          fetchData();
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        setError('Failed to check authentication status');
       }
     };
 
-    checkAuthentication();
+    checkAuth();
   }, []);
 
   useEffect(() => {
     if (authenticated && backlog.length === 0) {
-      const fetchBacklog = async () => {
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/backlog`, 
-            { withCredentials: true }
-          );
-          
-          if (!response.data || !response.data.issues) {
-            throw new Error('Invalid response format from server');
-          }
-
-          const issues = response.data.issues;
-          setBacklog(issues);
-          setError(null);
-          setApiError(false);
-        } catch (err) {
-          console.error('Error fetching backlog:', err.response?.data || err.message);
-          setError(err.response?.data?.error || err.response?.data?.details || 'Error fetching backlog');
-          setApiError(true);
-        }
-      };
-
-      fetchBacklog();
+      fetchData();
     }
   }, [authenticated, backlog.length]);
 
@@ -323,18 +338,20 @@ function SustainabilityBacklog() {
   const handleManualImport = () => {
     if (!manualIssue.summary) return;
 
+    const fields = {
+      summary: String(manualIssue.summary),
+      description: String(manualIssue.description || ''),
+      priority: {
+        name: String(manualIssue.priority)
+      },
+      customfield_10016: manualIssue.storyPoints ? parseInt(manualIssue.storyPoints) : null,
+      updated: new Date().toISOString()
+    };
+
     const newIssue = {
       id: `manual-${Date.now()}`,
       key: `MAN-${Date.now()}`,
-      fields: {
-        summary: manualIssue.summary,
-        description: manualIssue.description,
-        priority: {
-          name: manualIssue.priority
-        },
-        customfield_10016: manualIssue.storyPoints ? parseInt(manualIssue.storyPoints) : null,
-        updated: new Date().toISOString()
-      }
+      fields
     };
 
     setBacklog(prev => [...prev, newIssue]);
@@ -358,45 +375,88 @@ function SustainabilityBacklog() {
         let issues = [];
 
         if (file.name.endsWith('.json')) {
-          issues = JSON.parse(content);
+          const parsedContent = JSON.parse(content);
+          if (Array.isArray(parsedContent)) {
+            issues = parsedContent.map(item => {
+              // Ensure we have a valid object structure
+              const fields = {
+                summary: String(item.summary || item.fields?.summary || ''),
+                description: String(item.description || item.fields?.description || ''),
+                priority: {
+                  name: String(item.priority || item.fields?.priority?.name || 'Medium')
+                },
+                customfield_10016: item.storyPoints || item.fields?.customfield_10016 || null,
+                updated: new Date().toISOString()
+              };
+              
+              return {
+                id: `imported-${Date.now()}-${item.id || Math.random()}`,
+                key: String(item.key || `IMPORT-${Date.now()}`),
+                fields
+              };
+            });
+          } else if (typeof parsedContent === 'object') {
+            const fields = {
+              summary: String(parsedContent.summary || parsedContent.fields?.summary || ''),
+              description: String(parsedContent.description || parsedContent.fields?.description || ''),
+              priority: {
+                name: String(parsedContent.priority || parsedContent.fields?.priority?.name || 'Medium')
+              },
+              customfield_10016: parsedContent.storyPoints || parsedContent.fields?.customfield_10016 || null,
+              updated: new Date().toISOString()
+            };
+            
+            issues = [{
+              id: `imported-${Date.now()}-${parsedContent.id || Math.random()}`,
+              key: String(parsedContent.key || `IMPORT-${Date.now()}`),
+              fields
+            }];
+          }
         } else if (file.name.endsWith('.csv')) {
           const lines = content.split('\n');
           const headers = lines[0].split(',').map(h => h.trim());
           issues = lines.slice(1).map(line => {
             const values = line.split(',').map(v => v.trim());
+            const fields = {
+              summary: String(values[1] || ''),
+              description: String(values[2] || ''),
+              priority: {
+                name: String(values[3] || 'Medium')
+              },
+              customfield_10016: values[4] ? parseInt(values[4]) : null,
+              updated: new Date().toISOString()
+            };
+            
             return {
-              id: `imported-${Date.now()}-${values[0]}`,
-              key: values[0],
-              fields: {
-                summary: values[1],
-                description: values[2],
-                priority: {
-                  name: values[3]
-                },
-                customfield_10016: values[4] ? parseInt(values[4]) : null,
-                updated: new Date().toISOString()
-              }
+              id: `imported-${Date.now()}-${values[0] || Math.random()}`,
+              key: String(values[0] || `IMPORT-${Date.now()}`),
+              fields
             };
           });
         }
 
-        if (Array.isArray(issues)) {
+        if (issues.length > 0) {
           setBacklog(prev => [...prev, ...issues]);
+          setError(null);
         } else {
-          setError('Invalid file format. Please provide a valid JSON or CSV file.');
+          setError('No valid issues found in the file.');
         }
       } catch (err) {
+        console.error('Error parsing file:', err);
         setError('Error parsing file: ' + err.message);
       }
     };
 
-    if (file.name.endsWith('.json')) {
-      reader.readAsText(file);
-    } else if (file.name.endsWith('.csv')) {
+    if (file.name.endsWith('.json') || file.name.endsWith('.csv')) {
       reader.readAsText(file);
     } else {
       setError('Unsupported file format. Please use JSON or CSV.');
     }
+  };
+
+  const handleRemoveFromSustainability = (issue) => {
+    const newSustainabilityBacklog = sustainabilityBacklog.filter(i => i.id !== issue.id);
+    setSustainabilityBacklog(newSustainabilityBacklog);
   };
 
   if (loading) {
@@ -666,81 +726,43 @@ function SustainabilityBacklog() {
                     </Typography>
                   </Box>
                 ) : (
-                  sustainabilityBacklog.map((issue, index) => (
-                    <React.Fragment key={`sustainability-${issue.id}-fragment`}>
-                      <DropZone
-                        draggable={false}
-                        onDragEnter={(e) => handleDragEnter(e, index, 'sustainability')}
-                        onDragLeave={handleDragLeave}
-                        onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, 'sustainability')}
-                        isDropTarget={dropTargetIndex === index && dropTargetList === 'sustainability'}
-                      />
-                      <Box 
-                        key={`sustainability-${issue.id}-box`}
-                        draggable={isEditing}
-                        onDragStart={(e) => handleDragStart(e, issue, 'sustainability')}
-                        onDragEnter={(e) => handleDragEnter(e, index, 'sustainability')}
-                        onDragLeave={handleDragLeave}
-                        onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, 'sustainability')}
-                        mb={2}
-                        sx={{
-                          position: 'relative',
-                          cursor: isEditing ? 'grab' : 'default',
-                          '&:active': {
-                            cursor: isEditing ? 'grabbing' : 'default',
-                          },
-                          '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            left: 0,
-                            right: 0,
-                            height: '2px',
-                            backgroundColor: 'primary.main',
-                            opacity: 0,
-                            transition: 'opacity 0.2s',
-                          },
-                          '&[data-is-drop-target="true"]::before': {
-                            opacity: 1,
-                          },
-                        }}
-                      >
-                        <StyledCard isDragging={draggedItem?.id === issue.id}>
-                          <CardContent>
-                            <Typography variant="h6" component="h2" gutterBottom>
-                              {issue.fields.summary}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" paragraph>
-                              {issue.fields.description || 'No description available'}
-                            </Typography>
-                            <Box sx={{ mb: 2 }}>
-                              <Chip
-                                label={`Priority: ${issue.fields.priority.name}`}
-                                color={getPriorityColor(issue.fields.priority.name)}
-                                size="small"
-                                sx={{ mr: 1 }}
-                              />
-                              {issue.fields.customfield_10016 && (
-                                <Chip
-                                  label={`Story Points: ${issue.fields.customfield_10016}`}
-                                  color="primary"
-                                  size="small"
-                                />
-                              )}
-                            </Box>
-                            <Button
-                              variant="contained"
-                              size="small"
-                              onClick={() => handleViewDetails(issue)}
-                              sx={{ mt: 1 }}
-                            >
-                              View Details
-                            </Button>
-                          </CardContent>
-                        </StyledCard>
+                  sustainabilityBacklog.map((issue) => (
+                    <Box 
+                      key={issue.id} 
+                      sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        mb: 1,
+                        p: 1,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1
+                      }}
+                    >
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="subtitle1">{String(issue.fields?.summary || '')}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {String(issue.key || '')}
+                        </Typography>
                       </Box>
-                    </React.Fragment>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleViewDetails(issue)}
+                        >
+                          View Details
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleRemoveFromSustainability(issue)}
+                        >
+                          Remove
+                        </Button>
+                      </Box>
+                    </Box>
                   ))
                 )}
                 <DropZone
@@ -767,32 +789,32 @@ function SustainabilityBacklog() {
         {dialogMode === 'details' && selectedIssue ? (
           <>
             <DialogTitle>
-              {selectedIssue.fields.summary}
+              {String(selectedIssue.fields?.summary || '')}
               <Typography variant="subtitle2" color="text.secondary">
-                {selectedIssue.key}
+                {String(selectedIssue.key || '')}
               </Typography>
             </DialogTitle>
             <DialogContent>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="body1" paragraph>
-                  {selectedIssue.fields.description || 'No description available'}
+                  {String(selectedIssue.fields?.description || 'No description available')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                   <Chip
-                    label={`Priority: ${selectedIssue.fields.priority.name}`}
-                    color={getPriorityColor(selectedIssue.fields.priority.name)}
+                    label={`Priority: ${String(selectedIssue.fields?.priority?.name || 'Medium')}`}
+                    color={getPriorityColor(selectedIssue.fields?.priority?.name)}
                     size="small"
                   />
-                  {selectedIssue.fields.customfield_10016 && (
+                  {selectedIssue.fields?.customfield_10016 && (
                     <Chip
-                      label={`Impact Score: ${selectedIssue.fields.customfield_10016}`}
+                      label={`Impact Score: ${String(selectedIssue.fields.customfield_10016)}`}
                       color="primary"
                       size="small"
                     />
                   )}
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  Last updated: {new Date(selectedIssue.fields.updated).toLocaleDateString()}
+                  Last updated: {new Date(selectedIssue.fields?.updated || Date.now()).toLocaleDateString()}
                 </Typography>
               </Box>
             </DialogContent>
@@ -852,9 +874,9 @@ function SustainabilityBacklog() {
                           }}
                         >
                           <Box sx={{ flexGrow: 1 }}>
-                            <Typography variant="subtitle1">{issue.fields.summary}</Typography>
+                            <Typography variant="subtitle1">{String(issue.fields?.summary || '')}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {issue.key}
+                              {String(issue.key || '')}
                             </Typography>
                           </Box>
                           <Button
