@@ -35,7 +35,7 @@ app.use("/api/backlog", backlogRoutes);     // Routes for fetching backlog
 
 // Test route
 app.get('/test', (req, res) => {
-    res.status(200).json({ message: 'Test route is working!' });
+    res.status(200).json({ message: 'Test route is working' });
 });
 
 // Starting the server
