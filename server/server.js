@@ -33,6 +33,11 @@ app.use(cors({
 app.use("/auth", authRoutes);        // Routes for authentication
 app.use("/api/backlog", backlogRoutes);     // Routes for fetching backlog
 
+// Test route
+app.get('/test', (req, res) => {
+    res.status(200).json({ message: 'Test route is working!' });
+});
+
 // Starting the server
 app.listen(process.env.PORT, () => {
     console.log(`Server running on ${process.env.PORT}`);
