@@ -25,7 +25,7 @@ app.use(passport.session());
 
 // CORS setup
 app.use(cors({
-    origin: '*',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
 }));
 
