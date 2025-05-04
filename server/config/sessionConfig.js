@@ -3,8 +3,8 @@ module.exports = {
     resave: false,
     saveUninitialized: false,
     cookie: {
-        sameSite: 'none',              // REQUIRED for cross-site (frontend <> API)
-        secure: true,               // cookie only over HTTPS in prod
-        httpOnly: true,                // keeps JS from poking at it
+        sameSite: 'none',         // Needed for cross-site requests
+        secure: isProd,           // Enforce HTTPS in production
+        httpOnly: true,           // Prevent JavaScript access to cookies
     },
 };
