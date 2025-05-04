@@ -13,6 +13,14 @@ const backlogRoutes = require('./routes/backlogRoutes');
 
 const app = express();
 
+app.set('trust proxy', 1);
+
+// CORS setup
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+}));
+
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
@@ -22,12 +30,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
-
-// CORS setup
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-}));
 
 // Routes
 app.use("/auth", authRoutes);        // Routes for authentication

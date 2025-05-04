@@ -1,0 +1,14 @@
+Server deployment
+- https://www.youtube.com/watch?v=ofBFl4M4BFk
+- https://gist.github.com/piyushgarg-dev/8b14c87c8ff4d626ecbc747b6b9fc57f
+- https://www.youtube.com/watch?v=sT-BLJSU7Z0
+- https://www.youtube.com/watch?v=BnWfbv7Fy-k
+
+Atlassian devepoler console
+- https://developer.atlassian.com/console/myapps/
+
+Domain
+- https://www.spaceship.com/application
+
+AWS EC2
+- https://us-east-1.console.aws.amazon.com/ec2/home
