@@ -14,9 +14,7 @@ const app = express();
 // CORS configuration
 app.use(cors({
   origin: ['http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  credentials: true
 }));
 
 // Middleware
@@ -59,4 +57,4 @@ mongoose.connect(process.env.MONGO_URI)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
+}); 

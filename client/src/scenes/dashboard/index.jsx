@@ -14,6 +14,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
 
 import { useGetDashboardQuery } from "state/api";
 import {
@@ -30,7 +31,52 @@ const Dashboard = () => {
   // is large desktop screen
   const isNonMediumScreen = useMediaQuery("(min-width: 1200px)");
   // get data
-  const { data, isLoading } = useGetDashboardQuery();
+  const { data, isLoading, error } = useGetDashboardQuery();
+
+  // Log data and error states
+  React.useEffect(() => {
+    console.log('Dashboard Data:', data);
+    console.log('Loading State:', isLoading);
+    console.log('Error State:', error);
+  }, [data, isLoading, error]);
+
+  // Handle download report
+  const handleDownloadReport = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/dashboard/download-report', {
+        responseType: 'blob'
+      });
+      
+      // Create a blob from the response data
+      const blob = new Blob([response.data], { type: 'text/csv' });
+      
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a temporary link element
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'sustainability-report.csv');
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error downloading report:', error);
+    }
+  };
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <Box m="1.5rem 2.5rem">
+        <Typography variant="h4" color="error">
+          Error loading dashboard data: {error.message}
+        </Typography>
+      </Box>
+    );
+  }
 
   // data columns
   const columns = [
@@ -73,6 +119,7 @@ const Dashboard = () => {
         <Box>
           {/* Download Reports */}
           <Button
+            onClick={handleDownloadReport}
             sx={{
               backgroundColor: theme.palette.secondary.light,
               color: theme.palette.background.alt,
