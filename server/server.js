@@ -10,6 +10,7 @@ const passportConfig = require('./config/passport');
 const sessionConfig = require('./config/sessionConfig');
 const authRoutes = require('./routes/authRoutes');
 const backlogRoutes = require('./routes/backlogRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use(passport.session());
 // Routes
 app.use("/auth", authRoutes);        // Routes for authentication
 app.use("/api/backlog", backlogRoutes);     // Routes for fetching backlog
+app.use("/api/dashboard", dashboardRoutes);
 
 // Test route
 app.get('/test', (req, res) => {
