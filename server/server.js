@@ -16,9 +16,23 @@ const app = express();
 app.set('trust proxy', 1);
 
 // CORS setup
+const allowedOrigins = [
+    process.env.FRONTEND_URL, // https://capstone-project-tan-gamma.vercel.app
+    'http://localhost:3000', // For local testing
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: (origin, callback) => {
+        console.log('Request Origin:', origin);
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, origin);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // MongoDB connection
