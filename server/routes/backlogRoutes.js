@@ -62,7 +62,8 @@ router.get('/', async (req, res) => {
         } : err.message);
         res.status(500).json({
             error: 'Error fetching backlog',
-            details: err.response ? err.response.data : err.message
+            details: err.response ? err.response.data : err.message,
+            redirect: '/auth/atlassian',
         });
     }
 });
