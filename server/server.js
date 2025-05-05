@@ -8,6 +8,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
 const passportConfig = require('./config/passport');
+const sessionConfig = require('./config/sessionConfig');
 const authRoutes = require('./routes/authRoutes');
 const backlogRoutes = require('./routes/backlogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
@@ -44,18 +45,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session configuration
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGO_URI,
-        collectionName: 'sessions'
-    }),
-    cookie: {
-        maxAge: 1000 * 60 * 60 * 24 // 24 hours
-    }
-}));
+app.use(session(sessionConfig));
 
 // Passport middleware
 app.use(passport.initialize());
