@@ -1,15 +1,17 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+
+const passportConfig = require('./config/passport');
 const authRoutes = require('./routes/authRoutes');
 const backlogRoutes = require('./routes/backlogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
-dotenv.config();
 const app = express();
 
 app.set('trust proxy', 1);
