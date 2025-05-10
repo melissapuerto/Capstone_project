@@ -67,17 +67,6 @@ const StyledCard = styled(Card)(({ theme, isDragging }) => ({
   border: `1px solid ${theme.palette.divider}`,
 }));
 
-const DropIndicator = styled(Box)(({ theme }) => ({
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  height: '2px',
-  backgroundColor: theme.palette.primary.main,
-  opacity: 0,
-  transition: 'opacity 0.2s',
-  pointerEvents: 'none',
-}));
-
 const DropZone = styled(Box)(({ theme, isDropTarget }) => ({
   position: 'relative',
   minHeight: '20px',
@@ -104,13 +93,14 @@ const SustainabilityAppBar = styled(AppBar)(({ theme }) => ({
 
 function SustainabilityBacklog() {
   const [backlog, setBacklog] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [sustainabilityBacklog, setSustainabilityBacklog] = useState(() => {
     const saved = localStorage.getItem('sustainabilityBacklog');
     return saved ? JSON.parse(saved) : [];
   });
   const [error, setError] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
-  console.log('Authenticated:', authenticated);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -147,18 +137,45 @@ function SustainabilityBacklog() {
   }, []);
 
   useEffect(() => {
-    if (authenticated && backlog.length === 0) {
+    if (authenticated) {
+      const fetchProjects = async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/backlog/projects`,
+            { withCredentials: true }
+          );
+          console.log("response.data.projects", response.data.projects);
+
+          setProjects(response.data.projects);
+          setError(null);
+          setApiError(false);
+        } catch (err) {
+          console.error('Error fetching backlog:', err.response?.data || err.message);
+          setError(err.response?.data?.error || err.response?.data?.details || 'Error fetching backlog');
+          setApiError(true);
+        }
+      };
+
+      fetchProjects();
+    }
+  }, [authenticated]);
+
+  useEffect(() => {
+
+    if (authenticated && selectedProject) {
+      console.log("authenticated and selectedProject", authenticated, selectedProject);
       const fetchBacklog = async () => {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/backlog`,
+            `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/backlog?project=${selectedProject.key}`,
             { withCredentials: true }
           );
+
+          console.log("response.data", response.data);
 
           if (!response.data || !response.data.issues) {
             throw new Error('Invalid response format from server');
           }
-
           const issues = response.data.issues;
           setBacklog(issues);
           setError(null);
@@ -172,7 +189,7 @@ function SustainabilityBacklog() {
 
       fetchBacklog();
     }
-  }, [authenticated, backlog.length]);
+  }, [authenticated, selectedProject]);
 
   useEffect(() => {
     localStorage.setItem('sustainabilityBacklog', JSON.stringify(sustainabilityBacklog));
@@ -531,6 +548,28 @@ function SustainabilityBacklog() {
               </Button>
             )}
           </Box>
+
+          {/* Project Selection */}
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel>Select Project</InputLabel>
+              <Select
+                value={selectedProject ? selectedProject.key : ''}
+                onChange={(e) => {
+                  const project = projects.find(p => p.key === e.target.value);
+                  setSelectedProject(project);
+                }}
+                label="Select Project"
+              >
+                {projects.map((project) => (
+                  <MenuItem key={project.key} value={project.key}>
+                    {project.name} ({project.key})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
           {error && (
             <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', color: 'error.contrastText', borderRadius: 1 }}>
               <Typography variant="body1" gutterBottom>
@@ -546,186 +585,197 @@ function SustainabilityBacklog() {
               </Button>
             </Box>
           )}
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Paper
-                sx={{ p: 2, minHeight: '60vh' }}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, 'backlog')}
-              >
-                <Typography variant="h6" gutterBottom>
-                  All Sustainability Initiatives
-                </Typography>
-                {backlog.map((issue, index) => (
-                  <React.Fragment key={`backlog-${issue.id}-fragment`}>
-                    <DropZone
-                      draggable={false}
-                      onDragEnter={(e) => handleDragEnter(e, index, 'backlog')}
-                      onDragLeave={handleDragLeave}
-                      onDragOver={handleDragOver}
-                      onDrop={(e) => handleDrop(e, 'backlog')}
-                      isDropTarget={dropTargetIndex === index && dropTargetList === 'backlog'}
-                    />
-                    <Box
-                      key={`backlog-${issue.id}-box`}
-                      draggable={isEditing}
-                      onDragStart={(e) => handleDragStart(e, issue, 'backlog')}
-                      onDragEnter={(e) => handleDragEnter(e, index, 'backlog')}
-                      onDragLeave={handleDragLeave}
-                      onDragOver={handleDragOver}
-                      onDrop={(e) => handleDrop(e, 'backlog')}
-                      mb={2}
-                      sx={{
-                        position: 'relative',
-                        cursor: isEditing ? 'grab' : 'default',
-                        '&:active': {
-                          cursor: isEditing ? 'grabbing' : 'default',
-                        },
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          left: 0,
-                          right: 0,
-                          height: '2px',
-                          backgroundColor: 'primary.main',
-                          opacity: 0,
-                          transition: 'opacity 0.2s',
-                        },
-                        '&[data-is-drop-target="true"]::before': {
-                          opacity: 1,
-                        },
+
+          {!selectedProject ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="h6" color="text.secondary">
+                Please select a project to view its sustainability initiatives
+              </Typography>
+            </Box>
+          ) : (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Paper
+                  sx={{ p: 2, minHeight: '60vh' }}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, 'backlog')}
+                >
+                  <Typography variant="h6" gutterBottom>
+                    All Sustainability Initiatives
+                  </Typography>
+                  {backlog.map((issue, index) => (
+                    <React.Fragment key={`backlog-${issue.id}-fragment`}>
+                      <DropZone
+                        draggable={false}
+                        onDragEnter={(e) => handleDragEnter(e, index, 'backlog')}
+                        onDragLeave={handleDragLeave}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, 'backlog')}
+                        isDropTarget={dropTargetIndex === index && dropTargetList === 'backlog'}
+                      />
+                      <Box
+                        key={`backlog-${issue.id}-box`}
+                        draggable={isEditing}
+                        onDragStart={(e) => handleDragStart(e, issue, 'backlog')}
+                        onDragEnter={(e) => handleDragEnter(e, index, 'backlog')}
+                        onDragLeave={handleDragLeave}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, 'backlog')}
+                        mb={2}
+                        sx={{
+                          position: 'relative',
+                          cursor: isEditing ? 'grab' : 'default',
+                          '&:active': {
+                            cursor: isEditing ? 'grabbing' : 'default',
+                          },
+                          '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            backgroundColor: 'primary.main',
+                            opacity: 0,
+                            transition: 'opacity 0.2s',
+                          },
+                          '&[data-is-drop-target="true"]::before': {
+                            opacity: 1,
+                          },
+                        }}
+                      >
+                        <StyledCard isDragging={draggedItem?.id === issue.id}>
+                          <CardContent>
+                            <Typography variant="h6" component="h2" gutterBottom>
+                              {String(issue.fields?.summary || '')}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" paragraph>
+                              {String(issue.fields?.description || 'No description available')}
+                            </Typography>
+                            <Box sx={{ mb: 2 }}>
+                              <Chip
+                                label={`Priority: ${String(issue.fields?.priority?.name || 'Medium')}`}
+                                color={getPriorityColor(issue.fields?.priority?.name)}
+                                size="small"
+                                sx={{ mr: 1 }}
+                              />
+                              {issue.fields?.customfield_10016 && (
+                                <Chip
+                                  label={`Story Points: ${String(issue.fields.customfield_10016)}`}
+                                  color="primary"
+                                  size="small"
+                                />
+                              )}
+                            </Box>
+                            <Button
+                              variant="contained"
+                              size="small"
+                              onClick={() => handleViewDetails(issue)}
+                              sx={{ mt: 1 }}
+                            >
+                              View Details
+                            </Button>
+                          </CardContent>
+                        </StyledCard>
+                      </Box>
+                    </React.Fragment>
+                  ))}
+                  <DropZone
+                    key="backlog-end-zone"
+                    draggable={false}
+                    onDragEnter={(e) => handleDragEnter(e, backlog.length, 'backlog')}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, 'backlog')}
+                    isDropTarget={dropTargetIndex === backlog.length && dropTargetList === 'backlog'}
+                  />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Paper
+                  sx={{ p: 2, minHeight: '60vh' }}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, 'sustainability')}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6">
+                      Active Sustainability Projects
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => {
+                        setDialogMode('import');
+                        setOpenDialog(true);
                       }}
                     >
-                      <StyledCard isDragging={draggedItem?.id === issue.id}>
-                        <CardContent>
-                          <Typography variant="h6" component="h2" gutterBottom>
-                            {String(issue.fields?.summary || '')}
+                      Add New Effort
+                    </Button>
+                  </Box>
+                  {sustainabilityBacklog.length === 0 ? (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '50vh',
+                        textAlign: 'center',
+                        color: 'text.secondary'
+                      }}
+                    >
+                      <Typography variant="body1" gutterBottom>
+                        No sustainability items yet
+                      </Typography>
+                      <Typography variant="body2">
+                        Drag items from the All Sustainability Initiatives column or use the Add New Project button above
+                      </Typography>
+                    </Box>
+                  ) : (
+                    sustainabilityBacklog.map((issue) => (
+                      <Box
+                        key={issue.id}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          mb: 1,
+                          p: 1,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1
+                        }}
+                      >
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="subtitle1">{String(issue.fields?.summary || '')}</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {String(issue.key || '')}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" paragraph>
-                            {String(issue.fields?.description || 'No description available')}
-                          </Typography>
-                          <Box sx={{ mb: 2 }}>
-                            <Chip
-                              label={`Priority: ${String(issue.fields?.priority?.name || 'Medium')}`}
-                              color={getPriorityColor(issue.fields?.priority?.name)}
-                              size="small"
-                              sx={{ mr: 1 }}
-                            />
-                            {issue.fields?.customfield_10016 && (
-                              <Chip
-                                label={`Story Points: ${String(issue.fields.customfield_10016)}`}
-                                color="primary"
-                                size="small"
-                              />
-                            )}
-                          </Box>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
                           <Button
-                            variant="contained"
+                            variant="outlined"
                             size="small"
                             onClick={() => handleViewDetails(issue)}
-                            sx={{ mt: 1 }}
                           >
                             View Details
                           </Button>
-                        </CardContent>
-                      </StyledCard>
-                    </Box>
-                  </React.Fragment>
-                ))}
-                <DropZone
-                  key="backlog-end-zone"
-                  draggable={false}
-                  onDragEnter={(e) => handleDragEnter(e, backlog.length, 'backlog')}
-                  onDragLeave={handleDragLeave}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, 'backlog')}
-                  isDropTarget={dropTargetIndex === backlog.length && dropTargetList === 'backlog'}
-                />
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper
-                sx={{ p: 2, minHeight: '60vh' }}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, 'sustainability')}
-              >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6">
-                    Active Sustainability Projects
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                      setDialogMode('import');
-                      setOpenDialog(true);
-                    }}
-                  >
-                    Add New Effort
-                  </Button>
-                </Box>
-                {sustainabilityBacklog.length === 0 ? (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: '50vh',
-                      textAlign: 'center',
-                      color: 'text.secondary'
-                    }}
-                  >
-                    <Typography variant="body1" gutterBottom>
-                      No sustainability items yet
-                    </Typography>
-                    <Typography variant="body2">
-                      Drag items from the All Sustainability Initiatives column or use the Add New Project button above
-                    </Typography>
-                  </Box>
-                ) : (
-                  sustainabilityBacklog.map((issue) => (
-                    <Box
-                      key={issue.id}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        mb: 1,
-                        p: 1,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: 1
-                      }}
-                    >
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="subtitle1">{String(issue.fields?.summary || '')}</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {String(issue.key || '')}
-                        </Typography>
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            size="small"
+                            onClick={() => handleRemoveFromSustainability(issue)}
+                          >
+                            Remove
+                          </Button>
+                        </Box>
                       </Box>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => handleViewDetails(issue)}
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          size="small"
-                          onClick={() => handleRemoveFromSustainability(issue)}
-                        >
-                          Remove
-                        </Button>
-                      </Box>
-                    </Box>
-                  ))
-                )}
-              </Paper>
+                    ))
+                  )}
+                </Paper>
+              </Grid>
             </Grid>
-          </Grid>
+          )}
+
+
         </Box>
       </Container>
 

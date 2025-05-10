@@ -1,11 +1,10 @@
-const dotenv = require('dotenv');
-dotenv.config();
+require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
 
 const passportConfig = require('./config/passport');
 const sessionConfig = require('./config/sessionConfig');
@@ -16,6 +15,8 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const app = express();
 
 app.set('trust proxy', 1);
+
+
 
 // CORS setup
 const allowedOrigins = [
