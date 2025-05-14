@@ -10,6 +10,7 @@ import WasteManagement from "./waste-management";
 import DailyImpact from "./daily-impact";
 import MonthlyReport from "./monthly-report";
 import SustainabilityBacklog from "./sustainability-backlog";
+import KnowledgeSharing from './knowledge-sharing';
 
 // export scenes
 export { default as Dashboard } from "./dashboard";
@@ -21,3 +22,4 @@ export { default as WasteManagement } from "./waste-management";
 export { default as DailyImpact } from "./daily-impact";
 export { default as MonthlyReport } from "./monthly-report";
 export { default as SustainabilityBacklog } from "./sustainability-backlog";
+export { default as KnowledgeSharing } from './knowledge-sharing';

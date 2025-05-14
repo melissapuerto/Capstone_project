@@ -86,11 +86,11 @@ const navItems = [
     icon: <SpeedOutlined />,
   },
   {
-    text: "Performance",
+    text: "Guidelines",
     icon: null,
   },
   {
-    text: "Admin",
+    text: "Knowledge Sharing",
     icon: <AdminPanelSettingsOutlined />,
   },
 ];
