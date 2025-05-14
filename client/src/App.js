@@ -13,7 +13,8 @@ import {
   WasteManagement,
   DailyImpact,
   MonthlyReport,
-  SustainabilityBacklog
+  SustainabilityBacklog,
+  KnowledgeSharing
 } from "scenes";
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
               <Route path="/daily-impact" element={<DailyImpact />} />
               <Route path="/monthly-report" element={<MonthlyReport />} />
               <Route path="/sustainability-backlog" element={<SustainabilityBacklog />} />
+              <Route path="/knowledge-sharing" element={<KnowledgeSharing />} />
             </Route>
           </Routes>
         </ThemeProvider>
