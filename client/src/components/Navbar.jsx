@@ -94,18 +94,16 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
 
           {/* Accessibility */}
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             sx={{
               fontWeight: 600,
               borderRadius: 2,
               textTransform: 'none',
-              borderColor: theme.palette.primary.main,
-              color: theme.palette.primary.main,
+              backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.primary.dark,
+              color: '#fff',
               '&:hover': {
-                borderColor: theme.palette.primary.dark,
-                backgroundColor: theme.palette.primary.light,
-                color: theme.palette.primary.dark,
+                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
               },
               ml: 2,
             }}
