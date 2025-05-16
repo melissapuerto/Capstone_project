@@ -22,6 +22,7 @@ import {
   ArrowDropDownOutlined,
   GitHub,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 import { FlexBetween } from ".";
 import profileImage from "assets/profile.jpeg";
@@ -32,6 +33,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
   // theme
   const theme = useTheme();
+  const navigate = useNavigate();
 
   // nav state
   const [anchorEl, setAnchorEl] = useState(null);
@@ -89,6 +91,26 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           >
             <GitHub sx={{ fontSize: "25px" }} />
           </IconButton> */}
+
+          {/* Accessibility */}
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              fontWeight: 600,
+              borderRadius: 2,
+              textTransform: 'none',
+              backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.primary.dark,
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
+              },
+              ml: 2,
+            }}
+            onClick={() => navigate('/accessibility')}
+          >
+            Accessibility
+          </Button>
 
           {/* Dark/Light Mode */}
           <IconButton onClick={() => dispatch(setMode())} title="Dark Mode">

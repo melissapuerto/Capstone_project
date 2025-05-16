@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 
 import { Navbar, Sidebar } from "components";
 import { useGetUserQuery } from "state/api";
+import Footer from "../../components/Footer";
 
 // Layout
 const Layout = () => {
@@ -36,6 +37,7 @@ const Layout = () => {
           setIsSidebarOpen={setIsSidebarOpen}
         />
         <Outlet />
+        <Footer />
       </Box>
     </Box>
   );
