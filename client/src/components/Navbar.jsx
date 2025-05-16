@@ -61,7 +61,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           </IconButton>
 
           {/* Search */}
-          <FlexBetween
+          {/* <FlexBetween
             backgroundColor={theme.palette.background.alt}
             borderRadius="9px"
             gap="3rem"
@@ -72,13 +72,13 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
             <IconButton>
               <Search />
             </IconButton>
-          </FlexBetween>
+          </FlexBetween> */}
         </FlexBetween>
 
         {/* Right Side */}
         <FlexBetween gap="1.5rem">
           {/* Source Code */}
-          <IconButton
+          {/* <IconButton
             onClick={() =>
               window.open(
                 "http://www.github.com/sanidhyy/mern-admin/",
@@ -88,7 +88,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
             title="Source Code"
           >
             <GitHub sx={{ fontSize: "25px" }} />
-          </IconButton>
+          </IconButton> */}
 
           {/* Dark/Light Mode */}
           <IconButton onClick={() => dispatch(setMode())} title="Dark Mode">
@@ -100,9 +100,9 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           </IconButton>
 
           {/* Settings */}
-          <IconButton title="Setting">
+          {/* <IconButton title="Setting">
             <SettingsOutlined sx={{ fontSize: "25px" }} />
-          </IconButton>
+          </IconButton> */}
 
           {/* User */}
           <FlexBetween>

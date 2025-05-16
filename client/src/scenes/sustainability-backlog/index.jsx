@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Button } from '@mui/material';
+import { Container, Box, Typography, Button, useTheme } from '@mui/material';
 import { Edit as EditIcon, Login as LoginIcon } from '@mui/icons-material';
 import SustainabilityAppBar from '../../components/sustainabilityBacklog/SustainabilityAppBar';
 import ProjectSelector from '../../components/sustainabilityBacklog/ProjectSelector';
@@ -9,7 +9,9 @@ import ImportDialog from '../../components/sustainabilityBacklog/ImportDialog';
 import useAuth from '../../hooks/useAuth';
 import useBacklog from '../../hooks/useBacklog';
 
+
 function SustainabilityBacklog() {
+  const theme = useTheme();
   const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
   const [selectedProject, setSelectedProject] = useState(null);
   const { projects, backlog, setBacklog, error, setError } = useBacklog(authenticated, selectedProject);
@@ -203,9 +205,18 @@ function SustainabilityBacklog() {
           Please log in to view the sustainability backlog
         </Typography>
         <Button
-          variant="contained"
-          color="primary"
           onClick={handleLogin}
+          sx={{
+            backgroundColor: theme.palette.secondary.light,
+            color: theme.palette.background.alt,
+            fontSize: "14px",
+            fontWeight: "bold",
+            padding: "10px 20px",
+            "&:hover": {
+              backgroundColor: theme.palette.background.alt,
+              color: theme.palette.secondary.light,
+            },
+          }}
           startIcon={<LoginIcon />}
         >
           Login
@@ -224,18 +235,36 @@ function SustainabilityBacklog() {
           </Typography>
           {isEditing ? (
             <Button
-              variant="contained"
-              color="primary"
               onClick={() => setIsEditing(false)}
-              sx={{ minWidth: '120px' }}
+              sx={{
+                backgroundColor: theme.palette.secondary.light,
+                color: theme.palette.background.alt,
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                "&:hover": {
+                  backgroundColor: theme.palette.background.alt,
+                  color: theme.palette.secondary.light,
+                },
+              }}
             >
               Save Changes
             </Button>
           ) : (
             <Button
-              variant="outlined"
-              startIcon={<EditIcon />}
               onClick={() => setIsEditing(true)}
+              sx={{
+                backgroundColor: theme.palette.secondary.light,
+                color: theme.palette.background.alt,
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                "&:hover": {
+                  backgroundColor: theme.palette.background.alt,
+                  color: theme.palette.secondary.light,
+                },
+              }}
+              startIcon={<EditIcon />}
             >
               Manage Initiatives
             </Button>

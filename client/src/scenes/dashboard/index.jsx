@@ -166,10 +166,10 @@ const Dashboard = () => {
       renderCell: (params) => (
         <Box
           sx={{
-            backgroundColor: 
+            backgroundColor:
               params.value === "High" ? theme.palette.success.main :
-              params.value === "Medium" ? theme.palette.warning.main :
-              theme.palette.error.main,
+                params.value === "Medium" ? theme.palette.warning.main :
+                  theme.palette.error.main,
             padding: "4px 8px",
             borderRadius: "4px",
             color: "white",
@@ -186,10 +186,10 @@ const Dashboard = () => {
       renderCell: (params) => (
         <Box
           sx={{
-            backgroundColor: 
+            backgroundColor:
               params.value === "Active" ? theme.palette.success.main :
-              params.value === "Completed" ? theme.palette.info.main :
-              theme.palette.warning.main,
+                params.value === "Completed" ? theme.palette.info.main :
+                  theme.palette.warning.main,
             padding: "4px 8px",
             borderRadius: "4px",
             color: "white",
@@ -207,7 +207,7 @@ const Dashboard = () => {
       date: new Date().toLocaleDateString(),
       metrics: sustainabilityData,
     };
-    
+
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -222,9 +222,9 @@ const Dashboard = () => {
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
-        <Header 
-          title="SUSTAINABILITY DASHBOARD" 
-          subtitle="Track Your Green Impact" 
+        <Header
+          title="SUSTAINABILITY DASHBOARD"
+          subtitle="Track Your Green Impact"
         />
         <Button
           onClick={handleDownload}
@@ -321,6 +321,7 @@ const Dashboard = () => {
           backgroundColor={theme.palette.background.alt}
           p="1.5rem"
           borderRadius="0.55rem"
+          alt='A line graph titled "Monthly Impact Trend" displays two trends over six months, from January to June. The x-axis represents the months, while the y-axis represents impact value. The graph includes two lines: a red line labeled "Energy Saved," which shows a steady increase each month, and a beige line labeled "Carbon Reduction," which remains flat at zero throughout the period.'
         >
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100], mb: "1rem" }}>
             Monthly Impact Trend
@@ -416,7 +417,7 @@ const Dashboard = () => {
                   itemOpacity: 1,
                   symbolSize: 16,
                   itemBackground: "none",
-                  itemTextColor: "#fff",
+                  itemTextColor: theme.palette.secondary.light,
                   itemBorderRadius: 12,
                   itemPadding: 4,
                   effects: [],
@@ -437,6 +438,7 @@ const Dashboard = () => {
           backgroundColor={theme.palette.background.alt}
           p="1.5rem"
           borderRadius="0.55rem"
+          alt='A ring chart titled "Impact Distribution" displays the distribution of impact across three categories. The chart is divided into three segments'
         >
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100], mb: "1rem" }}>
             Impact Distribution
@@ -510,6 +512,7 @@ const Dashboard = () => {
           backgroundColor={theme.palette.background.alt}
           p="1.5rem"
           borderRadius="0.55rem"
+          alt='A bar chart titled "Resource Usage Comparison" compares usage percentages across four resource types: CPU Usage, Memory Usage, Network Traffic, and Storage Usage. The x-axis lists the resource types, while the y-axis represents usage percentage. Each resource type has two bars: a beige bar labeled "Before" and a red bar labeled "After," showing a reduction in usage for each category after a change.'
         >
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100], mb: "1rem" }}>
             Resource Usage Comparison
@@ -602,7 +605,7 @@ const Dashboard = () => {
                   itemOpacity: 1,
                   symbolSize: 16,
                   itemBackground: "none",
-                  itemTextColor: "#fff",
+                  itemTextColor: theme.palette.secondary.light,
                   itemBorderRadius: 12,
                   itemPadding: 4,
                   effects: [],

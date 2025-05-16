@@ -33,11 +33,11 @@ const SustainabilityAppBar = ({ authenticated, handleLogout, handleLogin }) => {
     return (
         <SustainabilityAppBarStyled position="static">
             <Toolbar>
-                <NatureIcon sx={{ mr: 2 }} />
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <NatureIcon sx={{ mr: 2, color: 'white' }} />
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'white' }}>
                     Sustainability Backlog
                 </Typography>
-                <IconButton color="inherit" onClick={handleMenu}>
+                <IconButton sx={{ color: 'white' }} onClick={handleMenu}>
                     <AccountCircleIcon />
                 </IconButton>
                 <Menu

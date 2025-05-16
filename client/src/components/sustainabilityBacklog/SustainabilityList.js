@@ -1,6 +1,6 @@
 import React from 'react';
 import { Paper, Typography, Box, Button } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 
 const DropZone = styled(Box)(({ theme, isDropTarget }) => ({
     position: 'relative',
@@ -36,6 +36,7 @@ const SustainabilityList = ({
     handleRemove,
     openImportDialog,
 }) => {
+    const theme = useTheme();
     return (
         <Paper
             sx={{ p: 2, minHeight: '60vh', flex: 1 }}
@@ -44,10 +45,20 @@ const SustainabilityList = ({
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">Active Sustainability Projects</Typography>
+
                 <Button
-                    variant="outlined"
-                    size="small"
                     onClick={openImportDialog}
+                    sx={{
+                        backgroundColor: theme.palette.secondary.light,
+                        color: theme.palette.background.alt,
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        padding: "5px 10px",
+                        "&:hover": {
+                            backgroundColor: theme.palette.background.alt,
+                            color: theme.palette.secondary.light,
+                        },
+                    }}
                 >
                     Add New Effort
                 </Button>
@@ -105,6 +116,14 @@ const SustainabilityList = ({
                                     variant="outlined"
                                     size="small"
                                     onClick={() => handleViewDetails(issue)}
+                                    sx={{
+                                        backgroundColor: theme.palette.secondary.light,
+                                        color: theme.palette.background.alt,
+                                        "&:hover": {
+                                            backgroundColor: theme.palette.background.alt,
+                                            color: theme.palette.secondary.light,
+                                        },
+                                    }}
                                 >
                                     View Details
                                 </Button>
