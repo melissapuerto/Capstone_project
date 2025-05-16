@@ -21,11 +21,13 @@ import {
   SettingsOutlined,
   ArrowDropDownOutlined,
   GitHub,
+  Timer,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 import { FlexBetween } from ".";
 import profileImage from "assets/profile.jpeg";
+import FocusMode from "./FocusMode";
 
 // Navbar
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
@@ -38,10 +40,19 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   // nav state
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
+  const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
+  const [isFocusModeActive, setIsFocusModeActive] = useState(false);
 
   // handle
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+
+  const handleFocusModeChange = (active) => {
+    setIsFocusModeActive(active);
+    if (active) {
+      setIsSidebarOpen(false);
+    }
+  };
 
   return (
     <AppBar
@@ -55,137 +66,186 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
         {/* Left Side */}
         <FlexBetween>
           {/* Sidebar Menu */}
-          <IconButton
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            title="Toggle Sidebar"
-          >
-            <MenuIcon />
-          </IconButton>
+          {!isFocusModeActive && (
+            <IconButton
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              title="Toggle Sidebar"
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
 
           {/* Search */}
-          <FlexBetween
-            backgroundColor={theme.palette.background.alt}
-            borderRadius="9px"
-            gap="3rem"
-            p="0.1rem 1.5rem"
-            title="Search"
-          >
-            <InputBase placeholder="Search..." />
-            <IconButton>
-              <Search />
-            </IconButton>
-          </FlexBetween>
+          {!isFocusModeActive && (
+            <FlexBetween
+              backgroundColor={theme.palette.background.alt}
+              borderRadius="9px"
+              gap="3rem"
+              p="0.1rem 1.5rem"
+              title="Search"
+            >
+              <InputBase placeholder="Search..." />
+              <IconButton>
+                <Search />
+              </IconButton>
+            </FlexBetween>
+          )}
         </FlexBetween>
 
         {/* Right Side */}
         <FlexBetween gap="1.5rem">
           {/* Source Code */}
-          <IconButton
-            onClick={() =>
-              window.open(
-                "http://www.github.com/sanidhyy/mern-admin/",
-                "_blank"
-              )
-            }
-            title="Source Code"
-          >
-            <GitHub sx={{ fontSize: "25px" }} />
-          </IconButton>
+          {!isFocusModeActive && (
+            <IconButton
+              onClick={() =>
+                window.open(
+                  "http://www.github.com/sanidhyy/mern-admin/",
+                  "_blank"
+                )
+              }
+              title="Source Code"
+            >
+              <GitHub sx={{ fontSize: "25px" }} />
+            </IconButton>
+          )}
 
-          {/* Accessibility */}
+          {/* Focus Mode */}
           <Button
             variant="contained"
             color="primary"
+            startIcon={<Timer />}
             sx={{
               fontWeight: 600,
               borderRadius: 2,
               textTransform: 'none',
-              backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.primary.dark,
+              backgroundColor: isFocusModeActive 
+                ? theme.palette.error.main 
+                : theme.palette.mode === 'dark' 
+                  ? theme.palette.primary.main 
+                  : theme.palette.primary.dark,
               color: '#fff',
               '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
+                backgroundColor: isFocusModeActive
+                  ? theme.palette.error.dark
+                  : theme.palette.mode === 'dark'
+                    ? theme.palette.primary.dark
+                    : theme.palette.primary.main,
               },
-              ml: 2,
             }}
-            onClick={() => navigate('/accessibility')}
+            onClick={() => setIsFocusModeOpen(true)}
           >
-            Accessibility
+            {isFocusModeActive ? 'Exit Focus Mode' : 'Focus Mode'}
           </Button>
 
+          {/* Accessibility */}
+          {!isFocusModeActive && (
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                fontWeight: 600,
+                borderRadius: 2,
+                textTransform: 'none',
+                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.primary.dark,
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
+                },
+                ml: 2,
+              }}
+              onClick={() => navigate('/accessibility')}
+            >
+              Accessibility
+            </Button>
+          )}
+
           {/* Dark/Light Mode */}
-          <IconButton onClick={() => dispatch(setMode())} title="Dark Mode">
-            {theme.palette.mode === "dark" ? (
-              <DarkModeOutlined sx={{ fontSize: "25px" }} />
-            ) : (
-              <LightModeOutlined sx={{ fontSize: "25px" }} />
-            )}
-          </IconButton>
+          {!isFocusModeActive && (
+            <IconButton onClick={() => dispatch(setMode())} title="Dark Mode">
+              {theme.palette.mode === "dark" ? (
+                <DarkModeOutlined sx={{ fontSize: "25px" }} />
+              ) : (
+                <LightModeOutlined sx={{ fontSize: "25px" }} />
+              )}
+            </IconButton>
+          )}
 
           {/* Settings */}
-          <IconButton title="Setting">
-            <SettingsOutlined sx={{ fontSize: "25px" }} />
-          </IconButton>
+          {!isFocusModeActive && (
+            <IconButton title="Setting">
+              <SettingsOutlined sx={{ fontSize: "25px" }} />
+            </IconButton>
+          )}
 
           {/* User */}
-          <FlexBetween>
-            <Button
-              onClick={handleClick}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                textTransform: "none",
-                gap: "1rem",
-              }}
-              title={user.name}
-            >
-              <Box
-                component="img"
-                alt="profile"
-                src={profileImage}
-                height="32px"
-                width="32px"
-                borderRadius="50%"
-                sx={{ objectFit: "cover" }}
-              />
-              <Box textAlign="left">
-                <Typography
-                  fontWeight="bold"
-                  fontSize="0.85rem"
-                  sx={{ color: theme.palette.secondary[100] }}
-                >
-                  {user.name}
-                </Typography>
-                <Typography
-                  fontSize="0.75rem"
-                  sx={{ color: theme.palette.secondary[200] }}
-                >
-                  {user.occupation}
-                </Typography>
-              </Box>
-              <ArrowDropDownOutlined
+          {!isFocusModeActive && (
+            <FlexBetween>
+              <Button
+                onClick={handleClick}
                 sx={{
-                  color: theme.palette.secondary[300],
-                  fontSize: "25px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  textTransform: "none",
+                  gap: "1rem",
                 }}
-              />
-            </Button>
+                title={user.name}
+              >
+                <Box
+                  component="img"
+                  alt="profile"
+                  src={profileImage}
+                  height="32px"
+                  width="32px"
+                  borderRadius="50%"
+                  sx={{ objectFit: "cover" }}
+                />
+                <Box textAlign="left">
+                  <Typography
+                    fontWeight="bold"
+                    fontSize="0.85rem"
+                    sx={{ color: theme.palette.secondary[100] }}
+                  >
+                    {user.name}
+                  </Typography>
+                  <Typography
+                    fontSize="0.75rem"
+                    sx={{ color: theme.palette.secondary[200] }}
+                  >
+                    {user.occupation}
+                  </Typography>
+                </Box>
+                <ArrowDropDownOutlined
+                  sx={{
+                    color: theme.palette.secondary[300],
+                    fontSize: "25px",
+                  }}
+                />
+              </Button>
 
-            {/* DropDown */}
-            <Menu
-              anchorEl={anchorEl}
-              open={isOpen}
-              onClose={handleClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
-              {/* log out */}
-              <MenuItem onClick={handleClose} title="Log Out">
-                Log Out
-              </MenuItem>
-            </Menu>
-          </FlexBetween>
+              {/* DropDown */}
+              <Menu
+                anchorEl={anchorEl}
+                open={isOpen}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              >
+                {/* log out */}
+                <MenuItem onClick={handleClose} title="Log Out">
+                  Log Out
+                </MenuItem>
+              </Menu>
+            </FlexBetween>
+          )}
         </FlexBetween>
       </Toolbar>
+
+      {/* Focus Mode Dialog */}
+      <FocusMode
+        isOpen={isFocusModeOpen}
+        onClose={() => setIsFocusModeOpen(false)}
+        onFocusModeChange={handleFocusModeChange}
+      />
     </AppBar>
   );
 };
