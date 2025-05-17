@@ -2,11 +2,8 @@ import React, { useState, useMemo } from "react";
 import {
   DownloadOutlined,
   Nature,
-  TrendingUp,
-  Assessment,
   LocalFlorist,
   WaterDrop,
-  Code,
   ElectricBolt,
 } from "@mui/icons-material";
 import {
@@ -15,13 +12,6 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
-  LinearProgress,
-  Card,
-  CardContent,
-  Grid,
-  Slider,
-  IconButton,
-  Paper,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { ResponsiveLine } from "@nivo/line";
