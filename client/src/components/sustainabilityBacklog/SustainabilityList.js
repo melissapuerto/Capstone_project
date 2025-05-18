@@ -132,6 +132,7 @@ const SustainabilityList = ({
                                     color="error"
                                     size="small"
                                     onClick={() => handleRemove(issue)}
+                                    disabled={!isEditing}
                                 >
                                     Remove
                                 </Button>

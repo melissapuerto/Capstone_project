@@ -13,9 +13,9 @@ import {
   WasteManagement,
   DailyImpact,
   MonthlyReport,
-  SustainabilityBacklog,
+  SustainabilityBacklogIndex, // Import the index as the main component
   KnowledgeSharing,
-  Accessibility
+  Accessibility,
 } from "scenes";
 
 function App() {
@@ -37,9 +37,11 @@ function App() {
               <Route path="/waste-management" element={<WasteManagement />} />
               <Route path="/daily-impact" element={<DailyImpact />} />
               <Route path="/monthly-report" element={<MonthlyReport />} />
-              <Route path="/sustainability-backlog" element={<SustainabilityBacklog />} />
               <Route path="/knowledge-sharing" element={<KnowledgeSharing />} />
               <Route path="/accessibility" element={<Accessibility />} />
+              <Route path="/sustainability-backlog" element={<SustainabilityBacklogIndex />} />
+              <Route path="/sustainability-backlog/create-new" element={<SustainabilityBacklogIndex />} />
+              <Route path="/sustainability-backlog/:projectKey" element={<SustainabilityBacklogIndex />} />
             </Route>
           </Routes>
         </ThemeProvider>

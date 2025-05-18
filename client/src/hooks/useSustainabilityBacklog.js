@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const useSustainabilityBacklog = () => {
-    const [sustainabilityBacklog, setSustainabilityBacklog] = useState(() => {
-        const saved = localStorage.getItem('sustainabilityBacklog');
-        return saved ? JSON.parse(saved) : [];
-    });
+const useSustainabilityBacklog = (projectKey) => {
+    const [sustainabilityBacklog, setSustainabilityBacklog] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [draggedItem, setDraggedItem] = useState(null);
     const [dropTargetIndex, setDropTargetIndex] = useState(null);
@@ -20,9 +20,46 @@ const useSustainabilityBacklog = () => {
         storyPoints: '',
     });
 
+    // Fetch sustainabilityBacklog from the backend
     useEffect(() => {
-        localStorage.setItem('sustainabilityBacklog', JSON.stringify(sustainabilityBacklog));
-    }, [sustainabilityBacklog]);
+        if (projectKey) {
+            const fetchSustainabilityBacklog = async () => {
+                setLoading(true);
+                try {
+                    const response = await axios.get(
+                        `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/project/${projectKey}/sustainability-backlog`,
+                        { withCredentials: true }
+                    );
+                    setSustainabilityBacklog(response.data || []);
+                    setError(null);
+                } catch (err) {
+                    setError(err.response?.data?.message || 'Error fetching sustainability backlog');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchSustainabilityBacklog();
+        }
+    }, [projectKey]);
+
+    // Update sustainabilityBacklog in the backend whenever it changes
+    const updateSustainabilityBacklog = async (sustainabilityBacklog, projectKey) => {
+        if (!projectKey || sustainabilityBacklog.length === 0) return;
+
+        try {
+            await axios.put(
+                `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/project/${projectKey}/sustainability-backlog`,
+                { sustainabilityBacklog },
+                { withCredentials: true }
+            );
+            setError(null);
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || 'Error updating sustainability backlog';
+            console.error('Update error:', errorMessage, err);
+            setError(errorMessage);
+        }
+    };
+
 
     const handleDragStart = (e, item, sourceList) => {
         if (!isEditing) {
@@ -81,6 +118,7 @@ const useSustainabilityBacklog = () => {
             }
         } catch (err) {
             console.error('Error handling drop:', err);
+            setError('Error handling drop operation');
         }
         setDraggedItem(null);
         setDropTargetIndex(null);
@@ -179,6 +217,8 @@ const useSustainabilityBacklog = () => {
     return {
         sustainabilityBacklog,
         setSustainabilityBacklog,
+        loading,
+        error,
         isEditing,
         setIsEditing,
         draggedItem,
@@ -204,6 +244,7 @@ const useSustainabilityBacklog = () => {
         handleRemoveFromSustainability,
         handleManualImport,
         handleFileImport,
+        updateSustainabilityBacklog
     };
 };
 

@@ -11,12 +11,11 @@ const sessionConfig = require('./config/sessionConfig');
 const authRoutes = require('./routes/authRoutes');
 const backlogRoutes = require('./routes/backlogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const projectRoutes = require('./routes/projectRoutes');
 
 const app = express();
 
 app.set('trust proxy', 1);
-
-
 
 // CORS setup
 const allowedOrigins = [
@@ -56,6 +55,7 @@ app.use(passport.session());
 app.use("/auth", authRoutes);        // Routes for authentication
 app.use("/api/backlog", backlogRoutes);     // Routes for fetching backlog
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/project", projectRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {
