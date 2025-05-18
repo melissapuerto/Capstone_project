@@ -11,7 +11,7 @@ Domain
 - https://www.spaceship.com/application
 
 AWS EC2
-- https://us-east-1.console.aws.amazon.com/ec2/home
+- https://eu-north-1.console.aws.amazon.com/ec2/home
 
 Cookies does not send plm:
 The main plm is in the NGINX. NGINX does not send the cookies to backend. This config in the NGINX solve the issue:
