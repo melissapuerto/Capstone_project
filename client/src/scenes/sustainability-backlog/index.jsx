@@ -8,6 +8,10 @@ import SustainabilityList from '../../components/sustainabilityBacklog/Sustainab
 import ImportDialog from '../../components/sustainabilityBacklog/ImportDialog';
 import useAuth from '../../hooks/useAuth';
 import useBacklog from '../../hooks/useBacklog';
+import {$sustainabilityBacklog, $currentProjectId, addSustainabilityBacklog, addTaskToSustainabilityBacklog, setCurrentProjectId} from '../../store/selector';
+
+import { useStore } from '@nanostores/react';
+
 
 function SustainabilityBacklog() {
   const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
@@ -31,6 +35,16 @@ function SustainabilityBacklog() {
     priority: 'Medium',
     storyPoints: '',
   });
+  const backlogStore = useStore($sustainabilityBacklog);
+  const currentProjectId = useStore($currentProjectId);
+
+  useEffect(() => {
+    if (selectedProject) {
+      setCurrentProjectId(selectedProject.id);
+      const project = {...selectedProject, tasks: []};
+      addSustainabilityBacklog({ ...backlogStore, ...project });
+    }
+  }, [selectedProject]);
 
   useEffect(() => {
     localStorage.setItem('sustainabilityBacklog', JSON.stringify(sustainabilityBacklog));
@@ -73,6 +87,7 @@ function SustainabilityBacklog() {
     try {
       const data = JSON.parse(e.dataTransfer.getData('text/plain'));
       const { item, sourceList } = data;
+      addTaskToSustainabilityBacklog(item, selectedProject.id);
       const dropIndex = dropTargetIndex !== null ? dropTargetIndex : targetList === 'backlog' ? backlog.length : sustainabilityBacklog.length;
 
       if (sourceList === targetList) {
@@ -214,8 +229,15 @@ function SustainabilityBacklog() {
     );
   }
 
+
+
   return (
     <Box sx={{ flexGrow: 1 }}>
+      {JSON.stringify(backlogStore)}
+      <hr />
+      {
+        JSON.stringify(currentProjectId)
+      }
       <SustainabilityAppBar authenticated={authenticated} handleLogout={handleLogout} handleLogin={handleLogin} />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>

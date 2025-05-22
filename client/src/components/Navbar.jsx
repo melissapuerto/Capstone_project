@@ -23,8 +23,10 @@ import {
   GitHub,
   Timer,
 } from "@mui/icons-material";
+import { resetUser } from "store/user";
+import { resetSustainabilityBacklog } from "store/selector";
 import { useNavigate } from "react-router-dom";
-
+import secureLocalStorage from "react-secure-storage";
 import { FlexBetween } from ".";
 import profileImage from "assets/profile.jpeg";
 import FocusMode from "./FocusMode";
@@ -45,6 +47,13 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
 
   // handle
   const handleClick = (event) => setAnchorEl(event.currentTarget);
+  const handleLogout = () => {
+    resetUser();
+    resetSustainabilityBacklog();
+    secureLocalStorage.clear();
+    setAnchorEl(null);
+    navigate("/");
+  };
   const handleClose = () => setAnchorEl(null);
 
   const handleFocusModeChange = (active) => {
@@ -73,22 +82,6 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
             >
               <MenuIcon />
             </IconButton>
-          )}
-
-          {/* Search */}
-          {!isFocusModeActive && (
-            <FlexBetween
-              backgroundColor={theme.palette.background.alt}
-              borderRadius="9px"
-              gap="3rem"
-              p="0.1rem 1.5rem"
-              title="Search"
-            >
-              <InputBase placeholder="Search..." />
-              <IconButton>
-                <Search />
-              </IconButton>
-            </FlexBetween>
           )}
         </FlexBetween>
 
@@ -231,7 +224,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
               >
                 {/* log out */}
-                <MenuItem onClick={handleClose} title="Log Out">
+                <MenuItem onClick={handleLogout} title="Log Out">
                   Log Out
                 </MenuItem>
               </Menu>

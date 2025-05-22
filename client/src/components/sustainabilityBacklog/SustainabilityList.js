@@ -1,6 +1,12 @@
 import React from 'react';
 import { Paper, Typography, Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import {
+  $currentProjectId,
+  $sustainabilityBacklog,
+  removeTaskFromSustainabilityBacklog,
+} from '../../store/selector';
+import { useStore } from '@nanostores/react';
 
 const DropZone = styled(Box)(({ theme, isDropTarget }) => ({
     position: 'relative',
@@ -22,7 +28,6 @@ const DropZone = styled(Box)(({ theme, isDropTarget }) => ({
 }));
 
 const SustainabilityList = ({
-    sustainabilityBacklog,
     isEditing,
     draggedItem,
     dropTargetIndex,
@@ -33,9 +38,14 @@ const SustainabilityList = ({
     handleDragOver,
     handleDrop,
     handleViewDetails,
-    handleRemove,
     openImportDialog,
 }) => {
+    const currentProjectId = useStore($currentProjectId);
+    const sustainabilityBacklogStore = useStore($sustainabilityBacklog);
+    const sustainabilityBacklog =
+        sustainabilityBacklogStore.find((project) => project.id === currentProjectId)
+            ?.tasks || [];
+
     return (
         <Paper
             sx={{ p: 2, minHeight: '60vh', flex: 1 }}
@@ -79,7 +89,9 @@ const SustainabilityList = ({
                             onDragLeave={handleDragLeave}
                             onDragOver={handleDragOver}
                             onDrop={(e) => handleDrop(e, 'sustainability')}
-                            isDropTarget={dropTargetIndex === index && dropTargetList === 'sustainability'}
+                            isDropTarget={
+                                dropTargetIndex === index && dropTargetList === 'sustainability'
+                            }
                         />
                         <Box
                             sx={{
@@ -112,7 +124,12 @@ const SustainabilityList = ({
                                     variant="outlined"
                                     color="error"
                                     size="small"
-                                    onClick={() => handleRemove(issue)}
+                                    onClick={() => {
+                                        removeTaskFromSustainabilityBacklog(
+                                            issue.id,
+                                            currentProjectId
+                                        );
+                                    }}
                                 >
                                     Remove
                                 </Button>
@@ -122,11 +139,15 @@ const SustainabilityList = ({
                 ))
             )}
             <DropZone
-                onDragEnter={(e) => handleDragEnter(e, sustainabilityBacklog.length, 'sustainability')}
+                onDragEnter={(e) =>
+                    handleDragEnter(e, sustainabilityBacklog.length, 'sustainability')
+                }
                 onDragLeave={handleDragLeave}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, 'sustainability')}
-                isDropTarget={dropTargetIndex === sustainabilityBacklog.length && dropTargetList === 'sustainability'}
+                isDropTarget={
+                    dropTargetIndex === sustainabilityBacklog.length && dropTargetList === 'sustainability'
+                }
             />
         </Paper>
     );

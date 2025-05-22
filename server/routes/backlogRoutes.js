@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
+const Backlog = require('../models/backlog');
 
 // Helper function to get cloud ID
 async function getCloudId(accessToken) {
@@ -77,7 +78,6 @@ router.get('/projects', async (req, res) => {
     }
 });
 
-
 // Route to get sustainability-filtered backlog data for a specific project
 router.get('/', async (req, res) => {
     if (!req.user) {
@@ -138,6 +138,52 @@ router.get('/', async (req, res) => {
             redirect: err.response && err.response.status === 401 ? '/auth/atlassian' : undefined,
         });
     }
+});
+
+/** NUESTRAS RUTAS */
+
+router.get('/backlog', async (req, res) => {
+    const { uid } = req.query;
+
+    if (!uid) {
+        return res.status(400).json({
+            error: 'UID is required',
+            details: 'Specify a uid via ?uid=UID',
+        });
+    }
+    const backlog = await Backlog.find({ uid });
+
+    return res.status(200).json({ data: backlog || [] });
+});
+
+router.patch('/backlog', async (req, res) => {
+    const { uid } = req.query;
+    const { data } = req.body;
+
+    if (!uid) {
+        return res.status(400).json({
+            error: 'UID is required',
+            details: 'Specify a uid via ?uid=UID',
+        });
+    }
+    if (!data) {
+        return res.status(400).json({
+            error: 'Data is required',
+            details: 'Specify data in the request body',
+        });
+    }
+
+    const backlog = await Backlog.findOneAndUpdate(
+        { uid },
+        { $set: data },
+        { new: true, runValidators: true, upsert: true }
+    );
+
+    if (!backlog) {
+        return res.status(404).json({ error: 'Backlog not found' });
+    }
+
+    res.status(200).json({ data: "ok", backlog });
 });
 
 module.exports = router;

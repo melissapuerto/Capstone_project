@@ -11,6 +11,7 @@ const sessionConfig = require('./config/sessionConfig');
 const authRoutes = require('./routes/authRoutes');
 const backlogRoutes = require('./routes/backlogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ const allowedOrigins = [
     'http://localhost:3001', // For local testing
     'http://localhost:3002', // For local testing
     'http://localhost:3003', // For local testing
+    '*'
 ];
 
 app.use(cors({
@@ -56,6 +58,7 @@ app.use(passport.session());
 app.use("/auth", authRoutes);        // Routes for authentication
 app.use("/api/backlog", backlogRoutes);     // Routes for fetching backlog
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/user", userRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {
