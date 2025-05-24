@@ -9,9 +9,11 @@ import useAuth from '../../hooks/useAuth';
 import useBacklog from '../../hooks/useBacklog';
 import useSustainabilityBacklog from '../../hooks/useSustainabilityBacklog';
 import LoginIcon from '@mui/icons-material/Login';
+import { useNavigate } from 'react-router-dom';
 
 function SustainabilityBacklog({ projectKey }) {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
     const { backlog, setBacklog, error, setError, loading: backlogLoading, selectedProject } = useBacklog(authenticated, projectKey);
     const {
@@ -90,6 +92,25 @@ function SustainabilityBacklog({ projectKey }) {
                     <Typography variant="h4" component="h1">
                         {selectedProject?.projectName} ( {selectedProject?.jiraProject.name} )
                     </Typography>
+
+                    <Button
+                        onClick={() => navigate(`/dashboard/${projectKey}`)}
+                        sx={{
+                            backgroundColor: theme.palette.secondary.light,
+                            color: theme.palette.background.alt,
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            padding: "10px 20px",
+                            "&:hover": {
+                                backgroundColor: theme.palette.background.alt,
+                                color: theme.palette.secondary.light,
+                            },
+                        }}
+                    >
+                        Dashboard
+                    </Button>
+
+
                     {isEditing ? (
                         <Button
                             onClick={() => {

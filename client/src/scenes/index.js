@@ -13,7 +13,7 @@ import SustainabilityBacklog from "./sustainability-backlog";
 import KnowledgeSharing from './knowledge-sharing';
 
 // export scenes
-export { default as Dashboard } from "./dashboard";
+export { default as DashboardIndex } from "./dashboard";
 export { default as Layout } from "./layout";
 export { default as CarbonFootprint } from "./carbon-footprint";
 export { default as EnergyEfficiency } from "./energy-efficiency";

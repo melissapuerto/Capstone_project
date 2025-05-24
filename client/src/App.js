@@ -5,7 +5,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import {
-  Dashboard,
+  DashboardIndex,
   Layout,
   CarbonFootprint,
   EnergyEfficiency,
@@ -30,7 +30,8 @@ function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<DashboardIndex />} />
+              <Route path="/dashboard/:projectKey" element={<DashboardIndex />} />
               <Route path="/carbon-footprint" element={<CarbonFootprint />} />
               <Route path="/energy-efficiency" element={<EnergyEfficiency />} />
               <Route path="/water-conservation" element={<WaterConservation />} />
