@@ -16,6 +16,7 @@ function SustainabilityBacklog({ projectKey }) {
     const navigate = useNavigate();
     const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
     const { backlog, setBacklog, error, setError, loading: backlogLoading, selectedProject } = useBacklog(authenticated, projectKey);
+    console.log(backlog);
     const {
         sustainabilityBacklog,
         isEditing,

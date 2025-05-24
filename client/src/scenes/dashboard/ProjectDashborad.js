@@ -3,7 +3,7 @@ import {
     DownloadOutlined,
     Nature,
     LocalFlorist,
-    WaterDrop,
+    AssignmentTurnedIn,
     ElectricBolt,
 } from "@mui/icons-material";
 import {
@@ -136,6 +136,15 @@ const ProjectDashborad = ({ projectKey }) => {
     const { authenticated, loading } = useAuth();
     const { loading: backlogLoading, selectedProject } = useBacklog(authenticated, projectKey);
 
+    // Calculate total story points using useMemo
+    const totalStoryPoints = useMemo(() => {
+        if (!selectedProject?.sustainabilityBacklog) return 0;
+        return selectedProject.sustainabilityBacklog.reduce((total, item) => {
+            const storyPoints = item.fields.customfield_10016 || 0; // Treat null as 0
+            return total + storyPoints;
+        }, 0);
+    }, [selectedProject]);
+
     const columns = [
         {
             field: "_id",
@@ -260,8 +269,19 @@ const ProjectDashborad = ({ projectKey }) => {
                 }}
             >
                 <StatBox
+                    title="Total Story Points"
+                    value={totalStoryPoints}
+                    increase=""
+                    description="In sustainability backlog"
+                    icon={
+                        <AssignmentTurnedIn
+                            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
+                        />
+                    }
+                />
+                <StatBox
                     title="Carbon Reduction"
-                    value={sustainabilityData.carbonReduction}
+                    value={`${totalStoryPoints * 2} kg`}
                     increase="+21%"
                     description="Since last month"
                     icon={
@@ -273,7 +293,7 @@ const ProjectDashborad = ({ projectKey }) => {
 
                 <StatBox
                     title="Trees Saved"
-                    value={sustainabilityData.treesSaved}
+                    value={`${totalStoryPoints * 5} trees`}
                     increase="+15%"
                     description="Equivalent trees saved"
                     icon={
@@ -285,23 +305,11 @@ const ProjectDashborad = ({ projectKey }) => {
 
                 <StatBox
                     title="Energy Saved"
-                    value={sustainabilityData.energySaved}
+                    value={`${totalStoryPoints * 3} kWh`}
                     increase="+25%"
                     description="Since last month"
                     icon={
                         <ElectricBolt
-                            sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-                        />
-                    }
-                />
-
-                <StatBox
-                    title="Water Conserved"
-                    value={sustainabilityData.waterConserved}
-                    increase="+18%"
-                    description="Since last month"
-                    icon={
-                        <WaterDrop
                             sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
                         />
                     }
