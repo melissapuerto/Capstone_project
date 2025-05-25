@@ -5,20 +5,13 @@ import useAuth from '../../hooks/useAuth';
 import useBacklog from '../../hooks/useBacklog';
 import LoginIcon from '@mui/icons-material/Login';
 import SustainabilityAppBar from '../../components/sustainabilityBacklog/SustainabilityAppBar';
-<<<<<<< HEAD
 import { increaseActiveStoryPoints } from 'store/storyPoints';
-=======
->>>>>>> origin/Melissa
 
 function ProjectListPage() {
     const theme = useTheme();
     const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
     const { userProjects, loading: backlogLoading } = useBacklog(authenticated, null); // Fetch existing projects
-<<<<<<< HEAD
     //console.log("userProjects", userProjects);
-=======
-    console.log("userProjects", userProjects);
->>>>>>> origin/Melissa
     const navigate = useNavigate();
 
     if (loading || backlogLoading) {
@@ -63,15 +56,12 @@ function ProjectListPage() {
                 Your Projects
             </Typography>
 
-<<<<<<< HEAD
             <button onClick={
                 () => increaseActiveStoryPoints("TP", 10)
             }>
                 click me to add a new story point
             </button>
 
-=======
->>>>>>> origin/Melissa
             {userProjects && userProjects.length > 0 ? (
                 <>
                     <Button

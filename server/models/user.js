@@ -21,10 +21,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-<<<<<<< HEAD
-=======
-        required: true
->>>>>>> origin/Melissa
+        // required: true   // Uncomment if you want password to be required
     },
     createdAt: {
         type: Date,
@@ -36,7 +33,6 @@ const userSchema = new mongoose.Schema({
         enum: ['HR', 'IT', 'Finance', 'Marketing', 'Sales'],
         default: 'IT'
     },
-<<<<<<< HEAD
     googleId: {
         type: String,
         allowNull: true,
@@ -45,8 +41,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         allowNull: true,
     }
-=======
->>>>>>> origin/Melissa
 });
 
 const User = mongoose.model('User', userSchema);

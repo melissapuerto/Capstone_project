@@ -23,15 +23,9 @@ import {
   GitHub,
   Timer,
 } from "@mui/icons-material";
-<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 import { resetUser, $user } from "store/user";
 import { useStore} from "@nanostores/react";
-=======
-import { resetUser } from "store/user";
-import { resetSustainabilityBacklog } from "store/selector";
-import { useNavigate } from "react-router-dom";
->>>>>>> origin/Melissa
 import secureLocalStorage from "react-secure-storage";
 import { FlexBetween } from ".";
 import profileImage from "assets/profile.jpeg";
@@ -44,10 +38,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   // theme
   const theme = useTheme();
   const navigate = useNavigate();
-<<<<<<< HEAD
   const usr = useStore($user);
-=======
->>>>>>> origin/Melissa
 
   // nav state
   const [anchorEl, setAnchorEl] = useState(null);
@@ -57,23 +48,12 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
 
   // handle
   const handleClick = (event) => setAnchorEl(event.currentTarget);
-<<<<<<< HEAD
   const handleClose = () => {
     setAnchorEl(null);
     secureLocalStorage.clear();
     resetUser();
     navigate("/");
   }
-=======
-  const handleLogout = () => {
-    resetUser();
-    resetSustainabilityBacklog();
-    secureLocalStorage.clear();
-    setAnchorEl(null);
-    navigate("/");
-  };
-  const handleClose = () => setAnchorEl(null);
->>>>>>> origin/Melissa
 
   const handleFocusModeChange = (active) => {
     setIsFocusModeActive(active);
@@ -102,7 +82,6 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               <MenuIcon />
             </IconButton>
           )}
-<<<<<<< HEAD
 
           {/* Search */}
           {!isFocusModeActive && (
@@ -119,8 +98,6 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               </IconButton>
             </FlexBetween>
           )}
-=======
->>>>>>> origin/Melissa
         </FlexBetween>
 
         {/* Right Side */}
@@ -149,17 +126,10 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               fontWeight: 600,
               borderRadius: 2,
               textTransform: 'none',
-<<<<<<< HEAD
               backgroundColor: isFocusModeActive
                 ? theme.palette.error.main
                 : theme.palette.mode === 'dark'
                   ? theme.palette.primary.main
-=======
-              backgroundColor: isFocusModeActive 
-                ? theme.palette.error.main 
-                : theme.palette.mode === 'dark' 
-                  ? theme.palette.primary.main 
->>>>>>> origin/Melissa
                   : theme.palette.primary.dark,
               color: '#fff',
               '&:hover': {
@@ -232,13 +202,9 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 <Box
                   component="img"
                   alt="profile"
-<<<<<<< HEAD
                   src={
                     usr.photo ? usr.photo : profileImage
                   }
-=======
-                  src={profileImage}
->>>>>>> origin/Melissa
                   height="32px"
                   width="32px"
                   borderRadius="50%"
@@ -275,11 +241,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
               >
                 {/* log out */}
-<<<<<<< HEAD
                 <MenuItem onClick={handleClose} title="Log Out">
-=======
-                <MenuItem onClick={handleLogout} title="Log Out">
->>>>>>> origin/Melissa
                   Log Out
                 </MenuItem>
               </Menu>

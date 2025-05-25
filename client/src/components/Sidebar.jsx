@@ -58,13 +58,6 @@ const navItems = [
     icon: <PowerOutlined />,
   },
   {
-<<<<<<< HEAD
-=======
-    text: "Accessibility",
-    icon: <WaterOutlined />,
-  },
-  {
->>>>>>> origin/Melissa
     text: "Waste Management",
     icon: <DeleteOutline />,
   },
