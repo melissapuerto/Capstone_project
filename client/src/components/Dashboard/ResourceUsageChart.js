@@ -121,4 +121,4 @@ const ResourceUsageChart = ({ data }) => {
     );
 };
 
-export default ResourceUsageChart; 
+export default ResourceUsageChart;

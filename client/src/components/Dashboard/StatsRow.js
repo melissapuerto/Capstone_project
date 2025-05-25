@@ -2,13 +2,13 @@ import React from "react";
 import { Box, useTheme, useMediaQuery } from "@mui/material";
 import { StatBox } from "components";
 import {
-    Nature,
-    LocalFlorist,
     AssignmentTurnedIn,
-    ElectricBolt,
+    Nature,
+    Update,
+    BarChart,
 } from "@mui/icons-material";
 
-const StatsRow = ({ totalStoryPoints }) => {
+const StatsRow = ({ totalStoryPoints, totalSustainabilityBacklog, recentlyUpdated }) => {
     const theme = useTheme();
     const isNonMediumScreen = useMediaQuery("(min-width: 1200px)");
 
@@ -28,7 +28,6 @@ const StatsRow = ({ totalStoryPoints }) => {
             <StatBox
                 title="Total Story Points"
                 value={totalStoryPoints}
-                increase=""
                 description="In sustainability backlog"
                 icon={
                     <AssignmentTurnedIn
@@ -37,36 +36,21 @@ const StatsRow = ({ totalStoryPoints }) => {
                 }
             />
             <StatBox
-                title="Carbon Reduction"
-                value={`${totalStoryPoints * 2} kg`}
-                increase="+21%"
-                description="Since last month"
+                title="Sustainability Backlog"
+                value={totalSustainabilityBacklog}
+                description="Total unique tasks"
                 icon={
                     <Nature
                         sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
                     />
                 }
             />
-
             <StatBox
-                title="Trees Saved"
-                value={`${totalStoryPoints * 5} trees`}
-                increase="+15%"
-                description="Equivalent trees saved"
+                title="Recently Updated"
+                value={recentlyUpdated}
+                description="Tasks updated in last 7 days"
                 icon={
-                    <LocalFlorist
-                        sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-                    />
-                }
-            />
-
-            <StatBox
-                title="Energy Saved"
-                value={`${totalStoryPoints * 3} kWh`}
-                increase="+25%"
-                description="Since last month"
-                icon={
-                    <ElectricBolt
+                    <Update
                         sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
                     />
                 }
@@ -75,4 +59,4 @@ const StatsRow = ({ totalStoryPoints }) => {
     );
 };
 
-export default StatsRow; 
+export default StatsRow;

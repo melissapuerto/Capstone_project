@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { DownloadOutlined } from "@mui/icons-material";
 import {
     Box,
@@ -13,46 +13,119 @@ import MonthlyImpactChart from "components/Dashboard/MonthlyImpactChart";
 import ImpactDistributionChart from "components/Dashboard/ImpactDistributionChart";
 import ResourceUsageChart from "components/Dashboard/ResourceUsageChart";
 import ProjectsTable from "components/Dashboard/ProjectsTable";
-import {
-    sustainabilityData,
-    monthlyImpactData,
-    impactDistributionData,
-    resourceUsageData,
-} from "components/Dashboard/DefaultDashboardData";
 import useAuth from "../../hooks/useAuth";
 import useBacklog from "../../hooks/useBacklog";
 
+// Utility to parse dates and calculate time differences
+const parseDate = (dateStr) => new Date(dateStr);
+const daysDifference = (date1, date2) => Math.floor((date1 - date2) / (1000 * 60 * 60 * 24));
 
-const ProjectDashborad = ({ projectKey }) => {
+const ProjectDashboard = ({ projectKey }) => {
     const theme = useTheme();
     const isNonMediumScreen = useMediaQuery("(min-width: 1200px)");
 
     const { authenticated, loading } = useAuth();
     const { loading: backlogLoading, selectedProject } = useBacklog(authenticated, projectKey);
 
-    // Calculate total story points using useMemo
-    const totalStoryPoints = useMemo(() => {
-        if (!selectedProject?.sustainabilityBacklog) return 0;
-        return selectedProject.sustainabilityBacklog.reduce((total, item) => {
-            const storyPoints = item.fields.customfield_10016 || 0; // Treat null as 0
+    // Calculate metrics using useMemo
+    const metrics = useMemo(() => {
+        if (!selectedProject?.sustainabilityBacklog) return {};
+
+        // Deduplicate tasks by id
+        const uniqueTasks = [];
+        const seenIds = new Set();
+        for (const item of selectedProject.sustainabilityBacklog) {
+            if (!seenIds.has(item.id)) {
+                seenIds.add(item.id);
+                uniqueTasks.push(item);
+            }
+        }
+
+        // Total story points
+        const totalStoryPoints = uniqueTasks.reduce((total, item) => {
+            const storyPoints = item.fields.customfield_10016 || 0;
             return total + storyPoints;
         }, 0);
+
+        // Total unique tasks
+        const totalSustainabilityBacklog = uniqueTasks.length;
+
+        // Priority distribution
+        const priorityCounts = uniqueTasks.reduce((acc, item) => {
+            const priority = item.fields.priority.name;
+            acc[priority] = (acc[priority] || 0) + 1;
+            return acc;
+        }, {});
+
+
+        // Use Date.now() for current date and time (adjusted to EEST)
+        const currentDate = new Date(Date.now());
+        currentDate.setUTCHours(currentDate.getUTCHours() + 3); // Adjust to EEST (UTC+3)
+        const recentlyUpdated = uniqueTasks.filter((item) => {
+            const updatedDate = parseDate(item.fields.updated);
+            return daysDifference(currentDate, updatedDate) <= 7;
+        }).length;
+
+        // Average story points per task
+        const avgStoryPoints = totalSustainabilityBacklog > 0 ? (totalStoryPoints / totalSustainabilityBacklog).toFixed(1) : 0;
+
+        // Task updates over time (group by month)
+        const updatesByMonth = uniqueTasks.reduce((acc, item) => {
+            const updatedDate = parseDate(item.fields.updated);
+            const month = updatedDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+            acc[month] = (acc[month] || 0) + 1;
+            return acc;
+        }, {});
+
+        const updateTrendData = Object.entries(updatesByMonth)
+            .map(([month, count]) => ({ x: month, y: count }))
+            .sort((a, b) => parseDate(a.x) - parseDate(b.x));
+
+        // Priority distribution for pie chart
+        const priorityDistributionData = Object.entries(priorityCounts).map(([priority, count]) => ({
+            id: priority,
+            label: priority,
+            value: count,
+            color: priority === "Medium" ? "#f39c12" : priority === "Low" ? "#3498db" : "#e74c3c",
+        }));
+
+        // Story points per task for bar chart
+        const storyPointsData = uniqueTasks.map((item) => ({
+            task: item.key,
+            storyPoints: item.fields.customfield_10016 || 0,
+        }));
+
+        return {
+            totalStoryPoints,
+            totalSustainabilityBacklog,
+            recentlyUpdated,
+            avgStoryPoints,
+            updateTrendData: [{ id: "Updates", data: updateTrendData }],
+            priorityDistributionData,
+            storyPointsData,
+            uniqueTasks,
+        };
     }, [selectedProject]);
-
-
 
     const handleDownload = () => {
         const report = {
-            title: "Sustainability Report",
+            title: "Project Dashboard Report",
             date: new Date().toLocaleDateString(),
-            metrics: sustainabilityData,
+            project: selectedProject?.projectName,
+            metrics: {
+                totalStoryPoints: metrics.totalStoryPoints,
+                totalSustainabilityBacklog: metrics.totalSustainabilityBacklog,
+                recentlyUpdated: metrics.recentlyUpdated,
+                avgStoryPoints: metrics.avgStoryPoints,
+                priorityDistribution: metrics.priorityCounts,
+            },
         };
 
         const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'sustainability-report.json';
+        a.download = 'project-dashboard-report.json';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -71,8 +144,8 @@ const ProjectDashborad = ({ projectKey }) => {
         <Box m="1.5rem 2.5rem">
             <FlexBetween>
                 <Header
-                    title={`${selectedProject?.projectName} ( ${selectedProject?.jiraProject.name})`}
-                    subtitle="Track Your Green Impact"
+                    title={`${selectedProject?.projectName} ( ${selectedProject?.jiraProject.name} )`}
+                    subtitle={`Created on ${new Date(selectedProject?.createdAt).toLocaleDateString()}`}
                 />
                 <Button
                     onClick={handleDownload}
@@ -93,7 +166,11 @@ const ProjectDashborad = ({ projectKey }) => {
                 </Button>
             </FlexBetween>
 
-            <StatsRow totalStoryPoints={totalStoryPoints} />
+            <StatsRow
+                totalStoryPoints={metrics.totalStoryPoints || 0}
+                totalSustainabilityBacklog={metrics.totalSustainabilityBacklog || 0}
+                recentlyUpdated={metrics.recentlyUpdated || 0}
+            />
 
             <Box
                 mt="20px"
@@ -101,14 +178,22 @@ const ProjectDashborad = ({ projectKey }) => {
                 gridTemplateColumns="repeat(12, 1fr)"
                 gap="20px"
             >
-                <MonthlyImpactChart data={monthlyImpactData} />
-                <ImpactDistributionChart data={impactDistributionData} />
-                <ResourceUsageChart data={resourceUsageData} />
+                <MonthlyImpactChart data={metrics.updateTrendData || []} />
+                <ImpactDistributionChart data={metrics.priorityDistributionData || []} />
             </Box>
 
-            <ProjectsTable rows={sustainabilityData.projects} />
+            <ProjectsTable
+                rows={metrics.uniqueTasks?.map(item => ({
+                    ...item,
+                    summary: item.fields.summary,
+                    priority: item.fields.priority.name,
+                    storyPoints: item.fields.customfield_10016 || 'Not assigned',
+                    updated: item.fields.updated,
+                    labels: item.fields.labels,
+                })) || []}
+            />
         </Box>
     );
 };
 
-export default ProjectDashborad;
+export default ProjectDashboard;

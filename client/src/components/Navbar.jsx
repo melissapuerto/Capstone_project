@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { resetUser, $user } from "store/user";
-import { useStore} from "@nanostores/react";
+import { useStore } from "@nanostores/react";
 import secureLocalStorage from "react-secure-storage";
 import { FlexBetween } from ".";
 import profileImage from "assets/profile.jpeg";

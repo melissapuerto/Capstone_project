@@ -42,6 +42,16 @@ export const tokensDark = {
   },
 };
 
+export const elisaBranding = {
+  primary: {
+    main: "#00239d",
+    mainAlt: "#005fed",
+    secondary: "#fff",
+    background: "#fff",
+    backgroundAlt: "#f6f6f7",
+  },
+};
+
 // function that reverses the color palette
 function reverseTokens(tokensDark) {
   const reversedTokens = {};
@@ -66,46 +76,46 @@ export const themeSettings = (mode) => {
       mode: mode,
       ...(mode === "dark"
         ? {
-            // palette values for dark mode
-            primary: {
-              ...tokensDark.primary,
-              main: tokensDark.primary[400],
-              light: tokensDark.primary[400],
-            },
-            secondary: {
-              ...tokensDark.secondary,
-              main: tokensDark.secondary[300],
-            },
-            neutral: {
-              ...tokensDark.grey,
-              main: tokensDark.grey[500],
-            },
-            background: {
-              default: tokensDark.primary[600],
-              alt: tokensDark.primary[500],
-            },
-          }
+          // palette values for dark mode
+          primary: {
+            ...tokensDark.primary,
+            main: tokensDark.primary[400],
+            light: tokensDark.primary[400],
+          },
+          secondary: {
+            ...tokensDark.secondary,
+            main: tokensDark.secondary[300],
+          },
+          neutral: {
+            ...tokensDark.grey,
+            main: tokensDark.grey[500],
+          },
+          background: {
+            default: tokensDark.primary[600],
+            alt: tokensDark.primary[500],
+          },
+        }
         : {
-            // palette values for light mode
-            primary: {
-              ...tokensLight.primary,
-              main: tokensDark.grey[50],
-              light: tokensDark.grey[100],
-            },
-            secondary: {
-              ...tokensLight.secondary,
-              main: tokensDark.secondary[600],
-              light: tokensDark.secondary[700],
-            },
-            neutral: {
-              ...tokensLight.grey,
-              main: tokensDark.grey[500],
-            },
-            background: {
-              default: tokensDark.grey[0],
-              alt: tokensDark.grey[50],
-            },
-          }),
+          // palette values for light mode
+          primary: {
+            ...tokensLight.primary,
+            main: tokensDark.grey[50],
+            light: tokensDark.grey[100],
+          },
+          secondary: {
+            ...tokensLight.secondary,
+            main: tokensDark.secondary[600],
+            light: tokensDark.secondary[700],
+          },
+          neutral: {
+            ...tokensLight.grey,
+            main: tokensDark.grey[500],
+          },
+          background: {
+            default: tokensDark.grey[0],
+            alt: tokensDark.grey[50],
+          },
+        }),
     },
     typography: {
       fontFamily: ["Inter", "sans-serif"].join(","),
