@@ -74,6 +74,10 @@ const AuthScreen = () => {
       newErrors.password = "La contraseña debe tener al menos 6 caracteres";
     }
 
+    if (!isLogin && formData.password !== formData.passwordConfirm) {
+      newErrors.passwordConfirm = "Las contraseñas no coinciden";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -160,17 +164,17 @@ const AuthScreen = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800">
-            {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+            {isLogin ? "Log In" : "Sign Up"}
           </h1>
           <p className="text-gray-600 mt-2">
             {isLogin
-              ? "Ingresa tus credenciales para acceder"
-              : "Completa el formulario para registrarte"}
+              ? "Enter your credentials to log in"
+              : "Fill out the form to sign up"}
           </p>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 w-full">
           {/* Campo de nombre (solo en registro) */}
           {!isLogin && (
             <div className="mt-6">
@@ -178,7 +182,7 @@ const AuthScreen = () => {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Nombre
+                Name
               </label>
               <div className="relative">
                 <input
@@ -187,10 +191,8 @@ const AuthScreen = () => {
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`pl-10 w-full py-2 px-4 border ${
-                    errors.name ? "border-red-500" : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                  placeholder="Tu nombre completo"
+                  className={`pl-10 w-full py-2 px-4 border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  placeholder="Your full name"
                 />
               </div>
               {errors.name && (
@@ -198,28 +200,27 @@ const AuthScreen = () => {
               )}
             </div>
           )}
+          {/* Campo de apellido (solo en registro) */}
           {!isLogin && (
-            <>
-              <div className="mt-6">
-                <label
-                  htmlFor="lastName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Apellido
-                </label>
-                <div className="relative">
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className={`pl-10 w-full py-2 px-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    placeholder="Apellido"
-                  />
-                </div>
+            <div className="mt-6">
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Last Name
+              </label>
+              <div className="relative">
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="pl-10 w-full py-2 px-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your last name"
+                />
               </div>
-            </>
+            </div>
           )}
 
           {/* Campo de email */}
@@ -228,7 +229,7 @@ const AuthScreen = () => {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Correo electrónico
+              Email
             </label>
             <div className="relative">
               <input
@@ -237,10 +238,8 @@ const AuthScreen = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`pl-10 w-full py-2 px-4 border ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                placeholder="ejemplo@correo.com"
+                className={`pl-10 w-full py-2 px-4 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                placeholder="example@email.com"
               />
             </div>
             {errors.email && (
@@ -254,7 +253,7 @@ const AuthScreen = () => {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Contraseña
+              Password
             </label>
             <div className="relative">
               <input
@@ -263,10 +262,8 @@ const AuthScreen = () => {
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={handleChange}
-                className={`pl-10 w-full py-2 px-4 border ${
-                  errors.password ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                placeholder={isLogin ? "Tu contraseña" : "Crea una contraseña"}
+                className={`pl-10 w-full py-2 px-4 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                placeholder={isLogin ? "Your password" : "Create a password"}
               />
               <button
                 type="button"
@@ -280,80 +277,71 @@ const AuthScreen = () => {
               <p className="mt-1 text-sm text-red-600">{errors.password}</p>
             )}
           </div>
+
           {/* Campo de confirmación de contraseña (solo en registro) */}
           {!isLogin && (
-            <>
-              <div className="mt-6">
-                <label
-                  htmlFor="passwordConfirm"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Confirmar contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    id="passwordConfirm"
-                    name="passwordConfirm"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.passwordConfirm}
-                    onChange={handleChange}
-                    className={`pl-10 w-full py-2 px-4 border ${
-                      errors.passwordConfirm
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    placeholder="Confirma tu contraseña"
-                  />
-                </div>
-                {errors.passwordConfirm && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.passwordConfirm}
-                  </p>
-                )}
+            <div className="mt-6">
+              <label
+                htmlFor="passwordConfirm"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  id="passwordConfirm"
+                  name="passwordConfirm"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.passwordConfirm}
+                  onChange={handleChange}
+                  className={`pl-10 w-full py-2 px-4 border ${errors.passwordConfirm ? "border-red-500" : "border-gray-300"} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  placeholder="Confirm your password"
+                />
               </div>
-            </>
+              {errors.passwordConfirm && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.passwordConfirm}
+                </p>
+              )}
+            </div>
           )}
 
           {/* Botón de envío */}
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col gap-3 w-full">
             <button
               type="submit"
               disabled={submitted}
-              className={`w-full flex items-center justify-center space-x-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                submitted
-                  ? "bg-green-500"
-                  : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              }`}
+              className={`w-full flex items-center justify-center py-2 px-4 rounded-md shadow-md text-sm font-bold text-white ${submitted ? "bg-green-500" : "bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"}`}
             >
-              {submitted ? (
-                "Enviado con éxito"
-              ) : (
-                <>
-                  <span>{isLogin ? "Iniciar Sesión" : "Registrarse"}</span>
-                </>
-              )}
+              {submitted ? "Success" : <span>{isLogin ? "Log In" : "Sign Up"}</span>}
             </button>
-            <button type="button" style={{marginTop: "10px"}} onClick={handleGoogleSignIn}>
-              <img
-                src="https://img.icons8.com/color/48/000000/google-logo.png"
-                alt="Google"
-                className="w-6 h-6 mr-2"
-              />
-              {isLogin ? "Iniciar sesión con Google" : "Registrarse con Google"}
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="w-full flex items-center justify-center gap-4 py-2 px-4 rounded-md bg-[#4285F4] text-white font-bold text-base shadow-md hover:bg-[#357ae8]"
+            >
+              <span className="bg-white rounded p-1 mr-3 w-8 h-8 flex items-center justify-center">
+                <img
+                  src="https://img.icons8.com/color/48/000000/google-logo.png"
+                  alt="Google"
+                  className="w-6 h-6"
+                />
+              </span>
+              <span>Continue with Google</span>
             </button>
           </div>
         </form>
 
         {/* Alternar entre inicio de sesión y registro */}
-        <div className=" text-center">
+        <div className="text-center">
           <button
             type="button"
             onClick={toggleAuthMode}
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             {isLogin
-              ? "¿No tienes cuenta? Regístrate"
-              : "¿Ya tienes cuenta? Inicia sesión"}
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Log in"}
           </button>
         </div>
       </div>
