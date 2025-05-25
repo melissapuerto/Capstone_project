@@ -24,7 +24,9 @@ import {
   Timer,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
+import { resetUser, $user } from "store/user";
+import { useStore} from "@nanostores/react";
+import secureLocalStorage from "react-secure-storage";
 import { FlexBetween } from ".";
 import profileImage from "assets/profile.jpeg";
 import FocusMode from "./FocusMode";
@@ -36,6 +38,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   // theme
   const theme = useTheme();
   const navigate = useNavigate();
+  const usr = useStore($user);
 
   // nav state
   const [anchorEl, setAnchorEl] = useState(null);
@@ -45,7 +48,12 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
 
   // handle
   const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
+  const handleClose = () => {
+    setAnchorEl(null);
+    secureLocalStorage.clear();
+    resetUser();
+    navigate("/");
+  }
 
   const handleFocusModeChange = (active) => {
     setIsFocusModeActive(active);
@@ -194,7 +202,9 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 <Box
                   component="img"
                   alt="profile"
-                  src={profileImage}
+                  src={
+                    usr.photo ? usr.photo : profileImage
+                  }
                   height="32px"
                   width="32px"
                   borderRadius="50%"

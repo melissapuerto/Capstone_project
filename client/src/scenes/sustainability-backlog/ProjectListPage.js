@@ -5,6 +5,7 @@ import useAuth from '../../hooks/useAuth';
 import useBacklog from '../../hooks/useBacklog';
 import LoginIcon from '@mui/icons-material/Login';
 import SustainabilityAppBar from '../../components/sustainabilityBacklog/SustainabilityAppBar';
+import { increaseActiveStoryPoints } from 'store/storyPoints';
 
 function ProjectListPage() {
     const theme = useTheme();
@@ -54,6 +55,12 @@ function ProjectListPage() {
             <Typography variant="h4" component="h1" mb={3} textAlign="center">
                 Your Projects
             </Typography>
+
+            <button onClick={
+                () => increaseActiveStoryPoints("TP", 10)
+            }>
+                click me to add a new story point
+            </button>
 
             {userProjects && userProjects.length > 0 ? (
                 <>

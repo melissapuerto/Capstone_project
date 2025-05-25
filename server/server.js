@@ -12,6 +12,7 @@ const authRoutes = require('./routes/authRoutes');
 const backlogRoutes = require('./routes/backlogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const projectRoutes = require('./routes/projectRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use("/auth", authRoutes);        // Routes for authentication
 app.use("/api/backlog", backlogRoutes);     // Routes for fetching backlog
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/project", projectRoutes);
+app.use("/api/user", userRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {

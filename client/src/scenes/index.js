@@ -24,3 +24,4 @@ export { default as MonthlyReport } from "./monthly-report";
 export { default as SustainabilityBacklogIndex } from "./sustainability-backlog";
 export { default as KnowledgeSharing } from './knowledge-sharing';
 export { default as Accessibility } from "./accessibility";
+export { default as AuthScreen } from "./auth";

@@ -41,7 +41,6 @@ const useBacklog = (authenticated, projectKey) => {
                         `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/project/key/${projectKey}`,
                         { withCredentials: true }
                     );
-                    console.log("response.data", response.data)
                     setSelectedProject(response.data);
                     setError(null);
                 } catch (err) {
