@@ -11,14 +11,24 @@ const sessionConfig = require('./config/sessionConfig');
 const authRoutes = require('./routes/authRoutes');
 const backlogRoutes = require('./routes/backlogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+<<<<<<< HEAD
 const projectRoutes = require('./routes/projectRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 
+=======
+const userRoutes = require('./routes/userRoutes');
+
+>>>>>>> origin/Melissa
 const app = express();
 
 app.set('trust proxy', 1);
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/Melissa
 // CORS setup
 const allowedOrigins = [
     process.env.FRONTEND_URL, // https://capstone-project-tan-gamma.vercel.app
@@ -26,6 +36,10 @@ const allowedOrigins = [
     'http://localhost:3001', // For local testing
     'http://localhost:3002', // For local testing
     'http://localhost:3003', // For local testing
+<<<<<<< HEAD
+=======
+    '*'
+>>>>>>> origin/Melissa
 ];
 
 app.use(cors({
@@ -57,8 +71,13 @@ app.use(passport.session());
 app.use("/auth", authRoutes);        // Routes for authentication
 app.use("/api/backlog", backlogRoutes);     // Routes for fetching backlog
 app.use("/api/dashboard", dashboardRoutes);
+<<<<<<< HEAD
 app.use("/api/project", projectRoutes);
 app.use("/api/user", userRoutes);
+=======
+app.use("/api/user", userRoutes);
+
+>>>>>>> origin/Melissa
 // Test route
 app.get('/api/test', (req, res) => {
     res.json({ message: 'API is working!' });

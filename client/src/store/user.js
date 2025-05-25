@@ -7,7 +7,10 @@ const initialState = {
     email: null,
     department: null,
     createdAt: null,
+<<<<<<< HEAD
     photo: null
+=======
+>>>>>>> origin/Melissa
 }
 
 // crea el estado inicial ("cuadrado") y lo exporta para ser usado en otros archivos

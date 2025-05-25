@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { $user, setUser } from "store/user";
@@ -8,6 +9,15 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import "./styles.css";
 
+=======
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { $user, setUser } from "store/user"; // Importa lo que actualmente tenga el store
+import { useStore } from "@nanostores/react"; // Importa el store
+import axios from "axios";
+import "./styles.css";
+import  secureLocalStorage  from  "react-secure-storage";
+>>>>>>> origin/Melissa
 
 const BACKEND_URL =
   process.env.REACT_APP_BACKEND_URL || "http://localhost:3002";
@@ -26,6 +36,7 @@ const AuthScreen = () => {
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
   const user = useStore($user); // Usa el store
+<<<<<<< HEAD
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
@@ -39,6 +50,8 @@ const AuthScreen = () => {
     }
   }, [token]);
 
+=======
+>>>>>>> origin/Melissa
 
   // Maneja los cambios en los campos del formulario
   const handleChange = (e) => {
@@ -95,7 +108,11 @@ const AuthScreen = () => {
           .then((response) => {
             console.log("Inicio de sesión exitoso", response.data.data);
 
+<<<<<<< HEAD
             secureLocalStorage.setItem("session", response.data.data); // Almacena el usuario en el almacenamiento seguro
+=======
+            secureLocalStorage.setItem("user", response.data.data); // Almacena el usuario en el almacenamiento seguro
+>>>>>>> origin/Melissa
 
             setUser(response.data.data); // Almacena el usuario en el store
             setSubmitted(true);
@@ -152,11 +169,14 @@ const AuthScreen = () => {
     });
   };
 
+<<<<<<< HEAD
   const handleGoogleSignIn = () => {
     // Redirige a la ruta de inicio de sesión de Google _self
     window.location.href = `${BACKEND_URL}/auth/google/signin`;
   }
 
+=======
+>>>>>>> origin/Melissa
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
@@ -316,6 +336,16 @@ const AuthScreen = () => {
               </div>
             </>
           )}
+<<<<<<< HEAD
+=======
+
+          {/* Recuperar contraseña (solo en login) */}
+          <div>
+            <h1>Store user info (global):</h1>
+            {JSON.stringify(user)}
+          </div>
+
+>>>>>>> origin/Melissa
           {/* Botón de envío */}
           <div className="mt-6">
             <button
@@ -335,6 +365,7 @@ const AuthScreen = () => {
                 </>
               )}
             </button>
+<<<<<<< HEAD
             <button type="button" style={{marginTop: "10px"}} onClick={handleGoogleSignIn}>
               <img
                 src="https://img.icons8.com/color/48/000000/google-logo.png"
@@ -344,6 +375,8 @@ const AuthScreen = () => {
               {isLogin ? "Iniciar sesión con Google" : "Registrarse con Google"}
             </button>
 
+=======
+>>>>>>> origin/Melissa
           </div>
         </form>
 

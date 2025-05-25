@@ -2,8 +2,16 @@ import React, { useState, useMemo } from "react";
 import {
   DownloadOutlined,
   Nature,
+<<<<<<< HEAD
   LocalFlorist,
   WaterDrop,
+=======
+  TrendingUp,
+  Assessment,
+  LocalFlorist,
+  WaterDrop,
+  Code,
+>>>>>>> origin/Melissa
   ElectricBolt,
 } from "@mui/icons-material";
 import {
@@ -12,15 +20,28 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
+<<<<<<< HEAD
+=======
+  LinearProgress,
+  Card,
+  CardContent,
+  Grid,
+  Slider,
+  IconButton,
+  Paper,
+>>>>>>> origin/Melissa
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { ResponsiveLine } from "@nivo/line";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import { FlexBetween, Header, StatBox, DataGridCustomToolbar } from "components";
+<<<<<<< HEAD
 import {useStore } from "@nanostores/react";
 import {$storyPoints} from "store/storyPoints";
 
+=======
+>>>>>>> origin/Melissa
 
 // Hardcoded data for sustainability metrics
 const sustainabilityData = {
@@ -133,7 +154,12 @@ const resourceUsageData = [
 const Dashboard = () => {
   const theme = useTheme();
   const isNonMediumScreen = useMediaQuery("(min-width: 1200px)");
+<<<<<<< HEAD
   const data = useStore($storyPoints);
+=======
+  const [treesValue, setTreesValue] = useState(150);
+  const [energyValue, setEnergyValue] = useState(45);
+>>>>>>> origin/Melissa
 
   const columns = [
     {
@@ -158,10 +184,17 @@ const Dashboard = () => {
       renderCell: (params) => (
         <Box
           sx={{
+<<<<<<< HEAD
             backgroundColor:
               params.value === "High" ? theme.palette.success.main :
                 params.value === "Medium" ? theme.palette.warning.main :
                   theme.palette.error.main,
+=======
+            backgroundColor: 
+              params.value === "High" ? theme.palette.success.main :
+              params.value === "Medium" ? theme.palette.warning.main :
+              theme.palette.error.main,
+>>>>>>> origin/Melissa
             padding: "4px 8px",
             borderRadius: "4px",
             color: "white",
@@ -178,10 +211,17 @@ const Dashboard = () => {
       renderCell: (params) => (
         <Box
           sx={{
+<<<<<<< HEAD
             backgroundColor:
               params.value === "Active" ? theme.palette.success.main :
                 params.value === "Completed" ? theme.palette.info.main :
                   theme.palette.warning.main,
+=======
+            backgroundColor: 
+              params.value === "Active" ? theme.palette.success.main :
+              params.value === "Completed" ? theme.palette.info.main :
+              theme.palette.warning.main,
+>>>>>>> origin/Melissa
             padding: "4px 8px",
             borderRadius: "4px",
             color: "white",
@@ -199,7 +239,11 @@ const Dashboard = () => {
       date: new Date().toLocaleDateString(),
       metrics: sustainabilityData,
     };
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> origin/Melissa
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -214,9 +258,15 @@ const Dashboard = () => {
   return (
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
+<<<<<<< HEAD
         <Header
           title="SUSTAINABILITY DASHBOARD"
           subtitle="Track Your Green Impact"
+=======
+        <Header 
+          title="SUSTAINABILITY DASHBOARD" 
+          subtitle="Track Your Green Impact" 
+>>>>>>> origin/Melissa
         />
         <Button
           onClick={handleDownload}
@@ -251,12 +301,19 @@ const Dashboard = () => {
         }}
       >
         <StatBox
+<<<<<<< HEAD
           title="Story points"
           value={
             data.storyPoints
           }
           increase="+21%"
           description="Compared to last month"
+=======
+          title="Carbon Reduction"
+          value={sustainabilityData.carbonReduction}
+          increase="+21%"
+          description="Since last month"
+>>>>>>> origin/Melissa
           icon={
             <Nature
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -265,8 +322,13 @@ const Dashboard = () => {
         />
 
         <StatBox
+<<<<<<< HEAD
           title="Active story points"
           value={data.projects.reduce((acc, project) => acc + project.activePoints, 0)}
+=======
+          title="Trees Saved"
+          value={sustainabilityData.treesSaved}
+>>>>>>> origin/Melissa
           increase="+15%"
           description="Equivalent trees saved"
           icon={
@@ -277,8 +339,13 @@ const Dashboard = () => {
         />
 
         <StatBox
+<<<<<<< HEAD
           title="Running projects"
           value={data.projects.length}
+=======
+          title="Energy Saved"
+          value={sustainabilityData.energySaved}
+>>>>>>> origin/Melissa
           increase="+25%"
           description="Since last month"
           icon={
@@ -289,8 +356,13 @@ const Dashboard = () => {
         />
 
         <StatBox
+<<<<<<< HEAD
           title="Total tasks"
           value={data.projects.reduce((acc, project) => acc + project.issues.length, 0)}
+=======
+          title="Water Conserved"
+          value={sustainabilityData.waterConserved}
+>>>>>>> origin/Melissa
           increase="+18%"
           description="Since last month"
           icon={
@@ -315,7 +387,10 @@ const Dashboard = () => {
           backgroundColor={theme.palette.background.alt}
           p="1.5rem"
           borderRadius="0.55rem"
+<<<<<<< HEAD
           alt='A line graph titled "Monthly Impact Trend" displays two trends over six months, from January to June. The x-axis represents the months, while the y-axis represents impact value. The graph includes two lines: a red line labeled "Energy Saved," which shows a steady increase each month, and a beige line labeled "Carbon Reduction," which remains flat at zero throughout the period.'
+=======
+>>>>>>> origin/Melissa
         >
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100], mb: "1rem" }}>
             Monthly Impact Trend
@@ -411,7 +486,11 @@ const Dashboard = () => {
                   itemOpacity: 1,
                   symbolSize: 16,
                   itemBackground: "none",
+<<<<<<< HEAD
                   itemTextColor: theme.palette.secondary.light,
+=======
+                  itemTextColor: "#fff",
+>>>>>>> origin/Melissa
                   itemBorderRadius: 12,
                   itemPadding: 4,
                   effects: [],
@@ -432,7 +511,10 @@ const Dashboard = () => {
           backgroundColor={theme.palette.background.alt}
           p="1.5rem"
           borderRadius="0.55rem"
+<<<<<<< HEAD
           alt='A ring chart titled "Impact Distribution" displays the distribution of impact across three categories. The chart is divided into three segments'
+=======
+>>>>>>> origin/Melissa
         >
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100], mb: "1rem" }}>
             Impact Distribution
@@ -506,7 +588,10 @@ const Dashboard = () => {
           backgroundColor={theme.palette.background.alt}
           p="1.5rem"
           borderRadius="0.55rem"
+<<<<<<< HEAD
           alt='A bar chart titled "Resource Usage Comparison" compares usage percentages across four resource types: CPU Usage, Memory Usage, Network Traffic, and Storage Usage. The x-axis lists the resource types, while the y-axis represents usage percentage. Each resource type has two bars: a beige bar labeled "Before" and a red bar labeled "After," showing a reduction in usage for each category after a change.'
+=======
+>>>>>>> origin/Melissa
         >
           <Typography variant="h6" sx={{ color: theme.palette.secondary[100], mb: "1rem" }}>
             Resource Usage Comparison
@@ -599,7 +684,11 @@ const Dashboard = () => {
                   itemOpacity: 1,
                   symbolSize: 16,
                   itemBackground: "none",
+<<<<<<< HEAD
                   itemTextColor: theme.palette.secondary.light,
+=======
+                  itemTextColor: "#fff",
+>>>>>>> origin/Melissa
                   itemBorderRadius: 12,
                   itemPadding: 4,
                   effects: [],

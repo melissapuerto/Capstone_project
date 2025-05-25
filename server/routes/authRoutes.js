@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require("express");
 const passport = require("passport");
 const router = express.Router();
@@ -44,10 +45,49 @@ router.get("/logout", (req, res) => {
 });
 
 router.post("/store-url", (req, res) => {
+=======
+const express = require('express');
+const passport = require('passport');
+const router = express.Router();
+
+// Route to start OAuth login
+router.get('/atlassian', passport.authenticate('atlassian'));
+
+// Callback route after successful login
+router.get('/atlassian/callback', passport.authenticate('atlassian', { failureRedirect: '/' }),
+    function (req, res) {
+        const redirectUrl = req.session.returnTo || '/sustainability-backlog';
+        delete req.session.returnTo; 
+        res.redirect(`${process.env.FRONTEND_URL}${redirectUrl}`);
+    });
+
+// Route to check authentication status
+router.get('/check-auth', (req, res) => {
+    if (req.user) {
+        res.json({ authenticated: true });
+    } else {
+        res.json({ authenticated: false });
+    }
+});
+
+// Route to log out the user
+router.get('/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            return res.status(500).send('Error logging out');
+        }
+        res.clearCookie('connect.sid');  // Clear the session cookie
+        res.send({ message: 'Logged out successfully' });
+    });
+});
+
+router.post('/store-url', (req, res) => {
+>>>>>>> origin/Melissa
   req.session.returnTo = req.body.returnTo;
   res.json({ success: true });
 });
 
+<<<<<<< HEAD
 router.get("/google/signin", (req, res) => {
   res.redirect(
     `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&scope=openid%20profile%20email&access_type=offline`
@@ -134,4 +174,6 @@ router.get("/google/callback", (req, res) => {
     });
 });
 
+=======
+>>>>>>> origin/Melissa
 module.exports = router;

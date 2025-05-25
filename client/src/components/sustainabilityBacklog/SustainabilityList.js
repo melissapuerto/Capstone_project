@@ -1,6 +1,16 @@
 import React from 'react';
 import { Paper, Typography, Box, Button } from '@mui/material';
+<<<<<<< HEAD
 import { styled, useTheme } from '@mui/material/styles';
+=======
+import { styled } from '@mui/material/styles';
+import {
+  $currentProjectId,
+  $sustainabilityBacklog,
+  removeTaskFromSustainabilityBacklog,
+} from '../../store/selector';
+import { useStore } from '@nanostores/react';
+>>>>>>> origin/Melissa
 
 const DropZone = styled(Box)(({ theme, isDropTarget }) => ({
     position: 'relative',
@@ -22,7 +32,10 @@ const DropZone = styled(Box)(({ theme, isDropTarget }) => ({
 }));
 
 const SustainabilityList = ({
+<<<<<<< HEAD
     sustainabilityBacklog,
+=======
+>>>>>>> origin/Melissa
     isEditing,
     draggedItem,
     dropTargetIndex,
@@ -33,10 +46,21 @@ const SustainabilityList = ({
     handleDragOver,
     handleDrop,
     handleViewDetails,
+<<<<<<< HEAD
     handleRemove,
     openImportDialog,
 }) => {
     const theme = useTheme();
+=======
+    openImportDialog,
+}) => {
+    const currentProjectId = useStore($currentProjectId);
+    const sustainabilityBacklogStore = useStore($sustainabilityBacklog);
+    const sustainabilityBacklog =
+        sustainabilityBacklogStore.find((project) => project.id === currentProjectId)
+            ?.tasks || [];
+
+>>>>>>> origin/Melissa
     return (
         <Paper
             sx={{ p: 2, minHeight: '60vh', flex: 1 }}
@@ -45,6 +69,7 @@ const SustainabilityList = ({
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">Active Sustainability Projects</Typography>
+<<<<<<< HEAD
 
                 <Button
                     onClick={openImportDialog}
@@ -59,6 +84,12 @@ const SustainabilityList = ({
                             color: theme.palette.secondary.light,
                         },
                     }}
+=======
+                <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={openImportDialog}
+>>>>>>> origin/Melissa
                 >
                     Add New Effort
                 </Button>
@@ -90,7 +121,13 @@ const SustainabilityList = ({
                             onDragLeave={handleDragLeave}
                             onDragOver={handleDragOver}
                             onDrop={(e) => handleDrop(e, 'sustainability')}
+<<<<<<< HEAD
                             isDropTarget={dropTargetIndex === index && dropTargetList === 'sustainability'}
+=======
+                            isDropTarget={
+                                dropTargetIndex === index && dropTargetList === 'sustainability'
+                            }
+>>>>>>> origin/Melissa
                         />
                         <Box
                             sx={{
@@ -116,6 +153,7 @@ const SustainabilityList = ({
                                     variant="outlined"
                                     size="small"
                                     onClick={() => handleViewDetails(issue)}
+<<<<<<< HEAD
                                     sx={{
                                         backgroundColor: theme.palette.secondary.light,
                                         color: theme.palette.background.alt,
@@ -124,6 +162,8 @@ const SustainabilityList = ({
                                             color: theme.palette.secondary.light,
                                         },
                                     }}
+=======
+>>>>>>> origin/Melissa
                                 >
                                     View Details
                                 </Button>
@@ -131,8 +171,17 @@ const SustainabilityList = ({
                                     variant="outlined"
                                     color="error"
                                     size="small"
+<<<<<<< HEAD
                                     onClick={() => handleRemove(issue)}
                                     disabled={!isEditing}
+=======
+                                    onClick={() => {
+                                        removeTaskFromSustainabilityBacklog(
+                                            issue.id,
+                                            currentProjectId
+                                        );
+                                    }}
+>>>>>>> origin/Melissa
                                 >
                                     Remove
                                 </Button>
@@ -142,14 +191,30 @@ const SustainabilityList = ({
                 ))
             )}
             <DropZone
+<<<<<<< HEAD
                 onDragEnter={(e) => handleDragEnter(e, sustainabilityBacklog.length, 'sustainability')}
                 onDragLeave={handleDragLeave}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, 'sustainability')}
                 isDropTarget={dropTargetIndex === sustainabilityBacklog.length && dropTargetList === 'sustainability'}
+=======
+                onDragEnter={(e) =>
+                    handleDragEnter(e, sustainabilityBacklog.length, 'sustainability')
+                }
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, 'sustainability')}
+                isDropTarget={
+                    dropTargetIndex === sustainabilityBacklog.length && dropTargetList === 'sustainability'
+                }
+>>>>>>> origin/Melissa
             />
         </Paper>
     );
 };
 
+<<<<<<< HEAD
 export default SustainabilityList;
+=======
+export default SustainabilityList;
+>>>>>>> origin/Melissa

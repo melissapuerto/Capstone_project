@@ -21,7 +21,13 @@ export { default as WaterConservation } from "./water-conservation";
 export { default as WasteManagement } from "./waste-management";
 export { default as DailyImpact } from "./daily-impact";
 export { default as MonthlyReport } from "./monthly-report";
+<<<<<<< HEAD
 export { default as SustainabilityBacklogIndex } from "./sustainability-backlog";
 export { default as KnowledgeSharing } from './knowledge-sharing';
 export { default as Accessibility } from "./accessibility";
 export { default as AuthScreen } from "./auth";
+=======
+export { default as SustainabilityBacklog } from "./sustainability-backlog";
+export { default as KnowledgeSharing } from './knowledge-sharing';
+export { default as Accessibility } from "./accessibility";
+>>>>>>> origin/Melissa
