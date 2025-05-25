@@ -56,11 +56,11 @@ function ProjectListPage() {
                 Your Projects
             </Typography>
 
-            <button onClick={
+            {/* <button onClick={
                 () => increaseActiveStoryPoints("TP", 10)
             }>
                 click me to add a new story point
-            </button>
+            </button> */}
 
             {userProjects && userProjects.length > 0 ? (
                 <>

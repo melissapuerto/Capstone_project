@@ -12,48 +12,17 @@ const ImpactDistributionChart = ({ data }) => {
             backgroundColor={theme.palette.background.alt}
             p="1.5rem"
             borderRadius="0.55rem"
-            alt='A ring chart titled "Impact Distribution" displays the distribution of impact across three categories. The chart is divided into three segments'
         >
             <Typography variant="h6" sx={{ color: theme.palette.secondary[100], mb: "1rem" }}>
-                Impact Distribution
+                Priority Distribution
             </Typography>
             <Box height="260px">
                 <ResponsivePie
                     data={data}
                     theme={{
-                        axis: {
-                            domain: {
-                                line: {
-                                    stroke: theme.palette.secondary[200],
-                                },
-                            },
-                            legend: {
-                                text: {
-                                    fill: theme.palette.secondary[200],
-                                    fontSize: 14,
-                                },
-                            },
-                            ticks: {
-                                line: {
-                                    stroke: theme.palette.secondary[200],
-                                    strokeWidth: 1,
-                                },
-                                text: {
-                                    fill: theme.palette.secondary[200],
-                                },
-                            },
-                        },
-                        legends: {
-                            text: {
-                                fill: theme.palette.secondary[200],
-                                fontSize: 14,
-                            },
-                        },
-                        tooltip: {
-                            container: {
-                                color: theme.palette.primary.main,
-                            },
-                        },
+                        axis: { domain: { line: { stroke: theme.palette.secondary[200] } } },
+                        legends: { text: { fill: theme.palette.secondary[200], fontSize: 14 } },
+                        tooltip: { container: { color: theme.palette.primary.main } },
                     }}
                     margin={{ top: 20, right: 40, bottom: 100, left: 40 }}
                     innerRadius={0.65}
@@ -61,19 +30,13 @@ const ImpactDistributionChart = ({ data }) => {
                     cornerRadius={3}
                     activeOuterRadiusOffset={8}
                     borderWidth={1}
-                    borderColor={{
-                        from: "color",
-                        modifiers: [["darker", 0.2]],
-                    }}
+                    borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
                     arcLinkLabelsSkipAngle={10}
                     arcLinkLabelsTextColor={theme.palette.secondary[200]}
                     arcLinkLabelsThickness={2}
                     arcLinkLabelsColor={{ from: "color" }}
                     arcLabelsSkipAngle={10}
-                    arcLabelsTextColor={{
-                        from: "color",
-                        modifiers: [["darker", 2]],
-                    }}
+                    arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
                     arcLabel={d => `${d.value}`}
                 />
             </Box>
@@ -81,4 +44,4 @@ const ImpactDistributionChart = ({ data }) => {
     );
 };
 
-export default ImpactDistributionChart; 
+export default ImpactDistributionChart;

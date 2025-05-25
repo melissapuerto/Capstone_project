@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { resetUser, $user } from "store/user";
-import { useStore} from "@nanostores/react";
+import { useStore } from "@nanostores/react";
 import secureLocalStorage from "react-secure-storage";
 import { FlexBetween } from ".";
 import profileImage from "assets/profile.jpeg";
@@ -84,11 +84,11 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           )}
 
           {/* Search */}
-          {!isFocusModeActive && (
+          {/* {!isFocusModeActive && (
             <FlexBetween
               backgroundColor={theme.palette.background.alt}
               borderRadius="9px"
-              gap="3rem"
+              gap="2rem"
               p="0.1rem 1.5rem"
               title="Search"
             >
@@ -97,13 +97,13 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 <Search />
               </IconButton>
             </FlexBetween>
-          )}
+          )} */}
         </FlexBetween>
 
         {/* Right Side */}
         <FlexBetween gap="1.5rem">
           {/* Source Code */}
-          {!isFocusModeActive && (
+          {/* {!isFocusModeActive && (
             <IconButton
               onClick={() =>
                 window.open(
@@ -115,7 +115,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
             >
               <GitHub sx={{ fontSize: "25px" }} />
             </IconButton>
-          )}
+          )} */}
 
           {/* Focus Mode */}
           <Button

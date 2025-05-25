@@ -6,7 +6,7 @@ const StatBox = ({ title, value, increase, description, icon }) => {
 
   return (
     <Box
-      gridColumn="span 3"
+      gridColumn="span 4"
       backgroundColor={theme.palette.background.alt}
       p="1.5rem"
       borderRadius="0.55rem"

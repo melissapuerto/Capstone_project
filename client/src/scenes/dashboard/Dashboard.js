@@ -16,6 +16,7 @@ import {
   monthlyImpactData,
   impactDistributionData,
   resourceUsageData,
+  projectTableData,
 } from "components/Dashboard/DefaultDashboardData";
 
 const Dashboard = () => {
@@ -65,7 +66,8 @@ const Dashboard = () => {
         </Button>
       </FlexBetween>
 
-      <StatsRow totalStoryPoints={150} />
+      <StatsRow totalStoryPoints={150} totalSustainabilityBacklog={92}
+        recentlyUpdated={5} />
 
       <Box
         mt="20px"
@@ -78,7 +80,7 @@ const Dashboard = () => {
         <ResourceUsageChart data={resourceUsageData} />
       </Box>
 
-      <ProjectsTable rows={sustainabilityData.projects} />
+      <ProjectsTable rows={projectTableData} />
     </Box>
   );
 };

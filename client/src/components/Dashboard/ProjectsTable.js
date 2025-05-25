@@ -4,35 +4,31 @@ import { DataGrid } from "@mui/x-data-grid";
 import { DataGridCustomToolbar } from "components";
 
 const ProjectsTable = ({ rows }) => {
+    console.log(rows);
     const theme = useTheme();
 
     const columns = [
         {
-            field: "_id",
-            headerName: "ID",
+            field: "key",
+            headerName: "Task ID",
             flex: 1,
         },
         {
-            field: "projectName",
-            headerName: "Project Name",
-            flex: 1,
+            field: "summary",
+            headerName: "Summary",
+            flex: 2,
         },
         {
-            field: "createdAt",
-            headerName: "Created At",
+            field: "priority",
+            headerName: "Priority",
             flex: 1,
-        },
-        {
-            field: "impactScore",
-            headerName: "Impact Score",
-            flex: 0.5,
             renderCell: (params) => (
                 <Box
                     sx={{
                         backgroundColor:
-                            params.value === "High" ? theme.palette.success.main :
+                            params.value === "High" ? theme.palette.error.main :
                                 params.value === "Medium" ? theme.palette.warning.main :
-                                    theme.palette.error.main,
+                                    theme.palette.info.main,
                         padding: "4px 8px",
                         borderRadius: "4px",
                         color: "white",
@@ -43,24 +39,25 @@ const ProjectsTable = ({ rows }) => {
             ),
         },
         {
-            field: "status",
-            headerName: "Status",
-            flex: 0.5,
-            renderCell: (params) => (
-                <Box
-                    sx={{
-                        backgroundColor:
-                            params.value === "Active" ? theme.palette.success.main :
-                                params.value === "Completed" ? theme.palette.info.main :
-                                    theme.palette.warning.main,
-                        padding: "4px 8px",
-                        borderRadius: "4px",
-                        color: "white",
-                    }}
-                >
-                    {params.value}
-                </Box>
-            ),
+            field: "storyPoints",
+            headerName: "Story Points",
+            flex: 1,
+        },
+        {
+            field: "updated",
+            headerName: "Last Updated",
+            flex: 1,
+            valueFormatter: (params) => {
+                return new Date(params.value).toLocaleDateString();
+            },
+        },
+        {
+            field: "labels",
+            headerName: "Labels",
+            flex: 1,
+            valueFormatter: (params) => {
+                return params.value?.join(", ") || "No labels";
+            },
         },
     ];
 
