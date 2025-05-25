@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, List, ListItem, TextField, Button, Paper, Select, MenuItem, FormControl, InputLabel, Avatar, Card, CardContent, CardMedia, Grid, IconButton, Tabs, Tab, Dialog, DialogTitle, DialogContent, DialogActions, Divider, InputAdornment, Tooltip } from '@mui/material';
 import { PhotoCamera, VideoLibrary, Edit, Delete, Favorite, FavoriteBorder, Share, Comment, Search } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 
 const KnowledgeSharing = () => {
   const userDetails = {
@@ -12,45 +13,45 @@ const KnowledgeSharing = () => {
   };
 
   const [posts, setPosts] = useState([
-    { 
-      id: 1, 
-      title: 'Optimizing Code for Energy Efficiency', 
-      content: 'Using efficient algorithms and data structures can significantly reduce the energy consumption of your applications.', 
-      author: 'Alice Johnson', 
-      project: 'Project A', 
-      department: 'Engineering', 
-      timestamp: '2023-10-01T10:00:00Z', 
-      media: 'https://www.youtube.com/embed/yxU1TawzROI', 
-      isEditable: false, 
-      isFavorite: false, 
+    {
+      id: 1,
+      title: 'Optimizing Code for Energy Efficiency',
+      content: 'Using efficient algorithms and data structures can significantly reduce the energy consumption of your applications.',
+      author: 'Alice Johnson',
+      project: 'Project A',
+      department: 'Engineering',
+      timestamp: '2023-10-01T10:00:00Z',
+      media: 'https://www.youtube.com/embed/yxU1TawzROI',
+      isEditable: false,
+      isFavorite: false,
       comments: [{ id: 1, text: 'Great post!', author: 'Bob Smith', timestamp: '2023-10-01T11:00:00Z' }],
       avatar: 'A'
     },
-    { 
-      id: 2, 
-      title: 'Green Coding Practices', 
-      content: 'Adopting practices like code reuse, modular design, and minimizing resource usage helps in creating sustainable software.', 
-      author: 'Bob Smith', 
-      project: 'Project B', 
-      department: 'Design', 
-      timestamp: '2023-10-02T11:30:00Z', 
-      media: 'https://www.youtube.com/embed/bFyjzleofxs', 
-      isEditable: false, 
-      isFavorite: false, 
+    {
+      id: 2,
+      title: 'Green Coding Practices',
+      content: 'Adopting practices like code reuse, modular design, and minimizing resource usage helps in creating sustainable software.',
+      author: 'Bob Smith',
+      project: 'Project B',
+      department: 'Design',
+      timestamp: '2023-10-02T11:30:00Z',
+      media: 'https://www.youtube.com/embed/bFyjzleofxs',
+      isEditable: false,
+      isFavorite: false,
       comments: [{ id: 1, text: 'Very informative!', author: 'Alice Johnson', timestamp: '2023-10-02T12:00:00Z' }],
       avatar: 'B'
     },
-    { 
-      id: 3, 
-      title: 'Sustainable Development Workflow', 
-      content: 'Implementing CI/CD pipelines that include energy profiling can help identify and reduce energy-intensive code paths.', 
-      author: 'Charlie Brown', 
-      project: 'Project A', 
-      department: 'Engineering', 
-      timestamp: '2023-10-03T09:15:00Z', 
-      media: 'https://www.youtube.com/embed/erXQSQ8DH9Y', 
-      isEditable: false, 
-      isFavorite: false, 
+    {
+      id: 3,
+      title: 'Sustainable Development Workflow',
+      content: 'Implementing CI/CD pipelines that include energy profiling can help identify and reduce energy-intensive code paths.',
+      author: 'Charlie Brown',
+      project: 'Project A',
+      department: 'Engineering',
+      timestamp: '2023-10-03T09:15:00Z',
+      media: 'https://www.youtube.com/embed/erXQSQ8DH9Y',
+      isEditable: false,
+      isFavorite: false,
       comments: [{ id: 1, text: 'Thanks for sharing!', author: 'Melissa Test', timestamp: '2023-10-03T10:00:00Z' }],
       avatar: 'C'
     },
@@ -81,6 +82,8 @@ const KnowledgeSharing = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const theme = useTheme();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -181,12 +184,12 @@ const KnowledgeSharing = () => {
   };
 
   const filteredPosts = posts.filter(post => {
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.author.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    return matchesSearch && 
+
+    return matchesSearch &&
       (filter.author === 'all' || post.author === filter.author) &&
       (filter.project === 'all' || post.project === filter.project) &&
       (filter.department === 'all' || post.department === filter.department);
@@ -205,10 +208,10 @@ const KnowledgeSharing = () => {
       <Box sx={{ p: 1 }}>
         <Typography variant="subtitle2">{name}</Typography>
         <Typography variant="body2" sx={{ mb: 1 }}>{details.role}</Typography>
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            color: '#2196f3', 
+        <Typography
+          variant="body2"
+          sx={{
+            color: '#2196f3',
             cursor: 'pointer',
             '&:hover': {
               textDecoration: 'underline'
@@ -246,7 +249,39 @@ const KnowledgeSharing = () => {
               </InputAdornment>
             ),
           }}
-          sx={{ mb: 2 }}
+          sx={{
+            mb: 2,
+            // Background color for the TextField
+            "& .MuiInputBase-root": {
+              backgroundColor: theme.palette.primary.main, // Adapts to light/dark theme
+              color: theme.palette.text.primary, // Text color adapts to theme
+              borderRadius: "4px", // Optional: consistent border radius
+            },
+            // Border color for default state
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: theme.palette.divider, // Border adapts to theme
+              },
+              "&:hover fieldset": {
+                borderColor: theme.palette.text.secondary, // Hover border adapts to theme
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: theme.palette.primary.main, // Focus border uses primary color
+              },
+            },
+
+            "& .MuiInputBase-input": {
+              color: theme.palette.text.primary,
+              marginTop: 0,
+              backgroundColor: theme.palette.primary.main,
+            },
+            // Placeholder text color
+            "& .MuiInputBase-input::placeholder": {
+              color: theme.palette.primary.main, // Placeholder adapts to theme
+              opacity: 1, // Ensure placeholder visibility
+              backgroundColor: theme.palette.primary.main,
+            },
+          }}
         />
         {tabValue === 0 && (
           <Grid container spacing={2}>
@@ -368,10 +403,42 @@ const KnowledgeSharing = () => {
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       size="small"
-                      sx={{ mr: 1 }}
+                      sx={{
+                        mr: 1,
+                        // Background color for the TextField
+                        "& .MuiInputBase-root": {
+                          backgroundColor: theme.palette.primary.main, // Adapts to light/dark theme
+                          color: theme.palette.text.primary, // Text color adapts to theme
+                          borderRadius: "4px", // Optional: consistent border radius
+                        },
+                        // Border color for default state
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            borderColor: theme.palette.divider, // Border adapts to theme
+                          },
+                          "&:hover fieldset": {
+                            borderColor: theme.palette.text.secondary, // Hover border adapts to theme
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: theme.palette.primary.main, // Focus border uses primary color
+                          },
+                        },
+
+                        "& .MuiInputBase-input": {
+                          color: theme.palette.text.primary,
+                          marginTop: 0,
+                          backgroundColor: theme.palette.primary.main,
+                        },
+                        // Placeholder text color
+                        "& .MuiInputBase-input::placeholder": {
+                          color: theme.palette.secondary.main, // Placeholder adapts to theme
+                          opacity: 1, // Ensure placeholder visibility
+                          backgroundColor: theme.palette.primary.main,
+                        },
+                      }}
                     />
-                    <Button 
-                      variant="contained" 
+                    <Button
+                      variant="contained"
                       onClick={() => handleAddComment(post.id)}
                       disabled={!newComment.trim()}
                     >

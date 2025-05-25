@@ -1,20 +1,19 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { Header } from "components";
 
 const MonthlyReport = () => {
+  const theme = useTheme();
   return (
-    <Box m="1.5rem 2.5rem">
-      <Header
-        title="MONTHLY REPORT"
-        subtitle="Monthly sustainability performance and trends"
-      />
-      <Box mt="40px" height="75vh">
-        <Typography variant="h4" color="primary">
-          Monthly Sustainability Report
-        </Typography>
-        {/* Add your monthly report content here */}
-      </Box>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="80vh"
+    >
+      <Typography variant="h4" color={theme.palette.secondary[200]}>
+        We are working on it
+      </Typography>
     </Box>
   );
 };
