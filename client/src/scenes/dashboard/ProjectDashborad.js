@@ -71,7 +71,7 @@ const ProjectDashborad = ({ projectKey }) => {
         <Box m="1.5rem 2.5rem">
             <FlexBetween>
                 <Header
-                    title="SUSTAINABILITY DASHBOARD"
+                    title={`${selectedProject?.projectName} ( ${selectedProject?.jiraProject.name})`}
                     subtitle="Track Your Green Impact"
                 />
                 <Button
