@@ -307,26 +307,60 @@ const AuthScreen = () => {
           )}
 
           {/* Botón de envío */}
-          <div className="mt-6 flex flex-col gap-3 w-full">
+          <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
             <button
               type="submit"
               disabled={submitted}
-              className={`w-full flex items-center justify-center py-2 px-4 rounded-md shadow-md text-sm font-bold text-white ${submitted ? "bg-green-500" : "bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"}`}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '9999px',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                color: '#fff',
+                background: submitted ? '#22c55e' : '#6366f1',
+                border: 'none',
+                cursor: 'pointer',
+                marginBottom: 12,
+                transition: 'background 0.2s',
+              }}
+              onMouseOver={e => { if (!submitted) e.currentTarget.style.background = '#4f46e5'; }}
+              onMouseOut={e => { if (!submitted) e.currentTarget.style.background = '#6366f1'; }}
             >
               {submitted ? "Success" : <span>{isLogin ? "Log In" : "Sign Up"}</span>}
             </button>
+            <div style={{ display: 'flex', alignItems: 'center', margin: '4px 0' }}>
+              <div style={{ flex: 1, height: 1, background: '#d1d5db' }} />
+              <span style={{ margin: '0 12px', color: '#6b7280', fontWeight: 600 }}>OR</span>
+              <div style={{ flex: 1, height: 1, background: '#d1d5db' }} />
+            </div>
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              className="w-full flex items-center justify-center gap-4 py-2 px-4 rounded-md bg-[#4285F4] text-white font-bold text-base shadow-md hover:bg-[#357ae8]"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                padding: '12px',
+                borderRadius: '9999px',
+                background: '#fff',
+                color: '#374151',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                border: '1px solid #e5e7eb',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+              }}
+              onMouseOver={e => { e.currentTarget.style.background = '#f3f4f6'; }}
+              onMouseOut={e => { e.currentTarget.style.background = '#fff'; }}
             >
-              <span className="bg-white rounded p-1 mr-3 w-8 h-8 flex items-center justify-center">
-                <img
-                  src="https://img.icons8.com/color/48/000000/google-logo.png"
-                  alt="Google"
-                  className="w-6 h-6"
-                />
-              </span>
+              <img
+                src="https://img.icons8.com/color/48/000000/google-logo.png"
+                alt="Google"
+                style={{ width: 22, height: 22, marginRight: 8 }}
+              />
               <span>Continue with Google</span>
             </button>
           </div>
