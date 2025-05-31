@@ -91,13 +91,13 @@ router.get("/", async (req, res) => {
   }
 
   const { accessToken } = req.user;
-  const projectKey = req.query.project || process.env.DEFAULT_PROJECT_KEY;
+  const projectKey = req.query.project;
 
   if (!projectKey) {
     return res.status(400).json({
       error: "Project key is required",
       details:
-        "Specify a project key via ?project=KEY or set DEFAULT_PROJECT_KEY in .env",
+        "Specify a project key via ?project=KEY",
     });
   }
 
@@ -107,39 +107,56 @@ router.get("/", async (req, res) => {
     await validateProjectKey(accessToken, cloudId, projectKey);
 
     const apiUrl = `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/search`;
-    const jql = `project = "${projectKey}" AND (summary ~ "sustainability" OR description ~ "sustainability" OR labels = "sustainability") ORDER BY priority DESC`;
+    const jql = `project = ${projectKey}`;
 
-    const response = await axios.get(apiUrl, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-      },
-      params: {
-        jql,
-        fields:
-          "summary,priority,issuetype,customfield_10016,description,updated,labels",
-      },
-    });
+    let allIssues = [];
+    let startAt = 0;
+    const maxResults = 50;
+    let hasMore = true;
 
-    if (!response.data || !response.data.issues) {
-      console.error("Invalid response format from Jira:", response.data);
-      return res.status(500).json({ error: "Invalid response from Jira" });
+    // Fetch all pages of issues
+    while (hasMore) {
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/json",
+        },
+        params: {
+          jql,
+          fields: "summary,priority,issuetype,customfield_10016,description,updated,labels,status",
+          startAt,
+          maxResults,
+        },
+      });
+
+      if (!response.data || !response.data.issues) {
+        console.error("Invalid response format from Jira:", response.data);
+        return res.status(500).json({ error: "Invalid response from Jira" });
+      }
+
+      const issues = response.data.issues;
+      allIssues = [...allIssues, ...issues];
+
+      // Check if there are more issues to fetch
+      hasMore = response.data.startAt + response.data.maxResults < response.data.total;
+      startAt += maxResults;
     }
 
     res.json({
       cloudId,
       projectKey,
-      issues: response.data.issues,
+      issuesLength: allIssues.length,
+      issues: allIssues,
     });
   } catch (err) {
     console.error(
       "Error fetching backlog:",
       err.response
         ? {
-            status: err.response.status,
-            data: err.response.data,
-            headers: err.response.headers,
-          }
+          status: err.response.status,
+          data: err.response.data,
+          headers: err.response.headers,
+        }
         : err.message
     );
     res.status(err.message.includes("not found") ? 404 : 500).json({
@@ -152,6 +169,7 @@ router.get("/", async (req, res) => {
     });
   }
 });
+
 
 router.get("/getAllProjects", async (req, res) => {
   if (!req.user) {

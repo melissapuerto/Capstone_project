@@ -16,7 +16,7 @@ function SustainabilityBacklog({ projectKey }) {
     const navigate = useNavigate();
     const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
     const { backlog, setBacklog, error, setError, loading: backlogLoading, selectedProject } = useBacklog(authenticated, projectKey);
-    console.log(error);
+    console.log("backlog", backlog);
     const {
         sustainabilityBacklog,
         isEditing,
@@ -48,11 +48,36 @@ function SustainabilityBacklog({ projectKey }) {
     } = useSustainabilityBacklog(projectKey);
 
     // Filter out backlog items that are already in sustainability backlog
-    const filteredBacklog = backlog.filter(backlogItem =>
-        !sustainabilityBacklog.some(sustainabilityItem =>
+    const filteredBacklog = backlog.filter(backlogItem => {
+        // First check if item is not in sustainability backlog
+        const notInSustainabilityBacklog = !sustainabilityBacklog.some(sustainabilityItem =>
             sustainabilityItem.id === backlogItem.id
-        )
-    );
+        );
+
+        // Then check if item has sustainability in summary or description
+        const hasSustainability = backlogItem.fields.summary.toLowerCase().includes('sustainability') ||
+            (backlogItem.fields.description?.content?.[0]?.content?.[0]?.text || '')
+                .toLowerCase()
+                .includes('sustainability');
+
+        return notInSustainabilityBacklog && hasSustainability;
+    });
+
+    // Get remaining backlog items for ImportDialog
+    const remainingBacklog = backlog.filter(backlogItem => {
+        // Check if item is not in sustainability backlog
+        const notInSustainabilityBacklog = !sustainabilityBacklog.some(sustainabilityItem =>
+            sustainabilityItem.id === backlogItem.id
+        );
+
+        // Check if item does not have sustainability in summary or description
+        const noSustainability = !backlogItem.fields.summary.toLowerCase().includes('sustainability') &&
+            !(backlogItem.fields.description?.content?.[0]?.content?.[0]?.text || '')
+                .toLowerCase()
+                .includes('sustainability');
+
+        return notInSustainabilityBacklog && noSustainability;
+    });
 
     if (loading || backlogLoading) {
         return (
@@ -218,7 +243,7 @@ function SustainabilityBacklog({ projectKey }) {
                     setDialogMode={setDialogMode}
                     importMode={importMode}
                     setImportMode={setImportMode}
-                    backlog={backlog}
+                    backlog={remainingBacklog}
                     sustainabilityBacklog={sustainabilityBacklog}
                     handleAddToSustainability={handleAddToSustainability}
                     handleFileImport={(e) => handleFileImport(e, backlog, setBacklog, setError)}

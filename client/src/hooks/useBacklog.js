@@ -109,6 +109,7 @@ const useBacklog = (authenticated, projectKey) => {
                         { withCredentials: true }
                     );
                     if (!response.data?.issues) throw new Error('Invalid response format');
+                    console.log("response.data", response.data);
                     setBacklog(response.data.issues);
                 } catch (err) {
                     setErrorState('backlog', err.response?.data?.error || 'Error fetching backlog');
