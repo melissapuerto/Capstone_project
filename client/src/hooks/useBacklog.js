@@ -5,105 +5,138 @@ const useBacklog = (authenticated, projectKey) => {
     const [userProjects, setUserProjects] = useState([]);
     const [jiraProjects, setJiraProjects] = useState([]);
     const [backlog, setBacklog] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false); // New loading state
+    const [errorStates, setErrorStates] = useState({
+        userProjects: null,
+        selectedProject: null,
+        jiraProjects: null,
+        backlog: null
+    });
+    const [loadingStates, setLoadingStates] = useState({
+        userProjects: false,
+        selectedProject: false,
+        jiraProjects: false,
+        backlog: false
+    });
     const [selectedProject, setSelectedProject] = useState(null);
+
+    // Helper function to update loading state
+    const setLoadingState = (key, value) => {
+        setLoadingStates(prev => ({
+            ...prev,
+            [key]: value
+        }));
+    };
+
+    // Helper function to update error state
+    const setErrorState = (key, value) => {
+        setErrorStates(prev => ({
+            ...prev,
+            [key]: value
+        }));
+    };
 
     useEffect(() => {
         if (authenticated) {
             const fetchAllProjects = async () => {
-                setLoading(true); // Start loading
+                setLoadingState('userProjects', true);
+                setErrorState('userProjects', null);
                 try {
                     const response = await axios.get(
                         `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/project/`,
                         { withCredentials: true }
                     );
                     setUserProjects(response.data);
-                    setError(null);
                 } catch (err) {
-                    setError(err.response?.data?.error || 'Error fetching projects');
+                    setErrorState('userProjects', err.response?.data?.error || 'Error fetching projects');
                 } finally {
-                    setLoading(false); // Stop loading regardless of success or failure
+                    setLoadingState('userProjects', false);
                 }
             };
             fetchAllProjects();
-        } else {
-            setLoading(false); // Reset loading if not authenticated
         }
     }, [authenticated]);
 
     useEffect(() => {
         if (authenticated && projectKey) {
             const fetchProject = async () => {
-                setLoading(true); // Start loading
+                setLoadingState('selectedProject', true);
+                setErrorState('selectedProject', null);
                 try {
                     const response = await axios.get(
                         `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/project/key/${projectKey}`,
                         { withCredentials: true }
                     );
                     setSelectedProject(response.data);
-                    setError(null);
                 } catch (err) {
-                    setError(err.response?.data?.error || 'Error fetching project');
+                    setErrorState('selectedProject', err.response?.data?.error || 'Error fetching project');
                 } finally {
-                    setLoading(false); // Stop loading regardless of success or failure
+                    setLoadingState('selectedProject', false);
                 }
             };
             fetchProject();
-        } else {
-            setLoading(false); // Reset loading if no projectKey or not authenticated
         }
     }, [authenticated, projectKey]);
 
     useEffect(() => {
         if (authenticated) {
             const fetchProjects = async () => {
-                setLoading(true); // Start loading
+                setLoadingState('jiraProjects', true);
+                setErrorState('jiraProjects', null);
                 try {
                     const response = await axios.get(
                         `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/backlog/projects`,
                         { withCredentials: true }
                     );
                     setJiraProjects(response.data.projects);
-                    setError(null);
                 } catch (err) {
-                    setError(err.response?.data?.error || 'Error fetching projects');
+                    setErrorState('jiraProjects', err.response?.data?.error || 'Error fetching projects');
                 } finally {
-                    setLoading(false); // Stop loading regardless of success or failure
+                    setLoadingState('jiraProjects', false);
                 }
             };
             fetchProjects();
-        } else {
-            setLoading(false); // Reset loading if not authenticated
         }
     }, [authenticated]);
 
     useEffect(() => {
         if (authenticated && projectKey) {
             const fetchBacklog = async () => {
-                setLoading(true); // Start loading
+                setLoadingState('backlog', true);
+                setErrorState('backlog', null);
                 try {
                     const response = await axios.get(
                         `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/api/backlog?project=${projectKey}`,
                         { withCredentials: true }
                     );
                     if (!response.data?.issues) throw new Error('Invalid response format');
-                    console.log("response.data.issues", response.data.issues);
                     setBacklog(response.data.issues);
-                    setError(null);
                 } catch (err) {
-                    setError(err.response?.data?.error || 'Error fetching backlog');
+                    setErrorState('backlog', err.response?.data?.error || 'Error fetching backlog');
                 } finally {
-                    setLoading(false); // Stop loading regardless of success or failure
+                    setLoadingState('backlog', false);
                 }
             };
             fetchBacklog();
-        } else {
-            setLoading(false); // Reset loading if no projectKey or not authenticated
         }
     }, [authenticated, projectKey]);
 
-    return { jiraProjects, userProjects, backlog, setBacklog, error, setError, loading, selectedProject };
+    // Compute overall loading state
+    const loading = Object.values(loadingStates).some(state => state === true);
+
+    // Compute overall error state
+    const error = Object.values(errorStates).find(state => state !== null) || null;
+
+    return {
+        jiraProjects,
+        userProjects,
+        backlog,
+        setBacklog,
+        error,
+        errorStates,
+        loading,
+        loadingStates,
+        selectedProject
+    };
 };
 
 export default useBacklog;

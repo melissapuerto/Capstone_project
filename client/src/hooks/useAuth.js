@@ -9,6 +9,7 @@ const useAuth = () => {
     useEffect(() => {
         const checkAuthentication = async () => {
             try {
+                setLoading(true);
                 const response = await axios.get(
                     `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/auth/check-auth`,
                     { withCredentials: true }

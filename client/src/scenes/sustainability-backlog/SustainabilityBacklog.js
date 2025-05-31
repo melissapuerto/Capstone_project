@@ -16,7 +16,7 @@ function SustainabilityBacklog({ projectKey }) {
     const navigate = useNavigate();
     const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
     const { backlog, setBacklog, error, setError, loading: backlogLoading, selectedProject } = useBacklog(authenticated, projectKey);
-    console.log(backlog);
+    console.log(error);
     const {
         sustainabilityBacklog,
         isEditing,
@@ -47,7 +47,12 @@ function SustainabilityBacklog({ projectKey }) {
         updateSustainabilityBacklog
     } = useSustainabilityBacklog(projectKey);
 
-
+    // Filter out backlog items that are already in sustainability backlog
+    const filteredBacklog = backlog.filter(backlogItem =>
+        !sustainabilityBacklog.some(sustainabilityItem =>
+            sustainabilityItem.id === backlogItem.id
+        )
+    );
 
     if (loading || backlogLoading) {
         return (
@@ -57,7 +62,7 @@ function SustainabilityBacklog({ projectKey }) {
         );
     }
 
-    if (!authenticated || apiError) {
+    if (!authenticated || apiError || error) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" flexDirection="column" gap={2}>
                 <Typography variant="h5" color="text.secondary">
@@ -170,7 +175,7 @@ function SustainabilityBacklog({ projectKey }) {
 
                 <Box sx={{ display: 'flex', gap: 3 }}>
                     <BacklogList
-                        backlog={backlog}
+                        backlog={filteredBacklog}
                         isEditing={isEditing}
                         draggedItem={draggedItem}
                         dropTargetIndex={dropTargetIndex}
