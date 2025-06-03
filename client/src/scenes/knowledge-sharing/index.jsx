@@ -1,87 +1,79 @@
-import React, { useState } from 'react';
-import { Box, Typography, List, ListItem, TextField, Button, Paper, Select, MenuItem, FormControl, InputLabel, Avatar, Card, CardContent, CardMedia, Grid, IconButton, Tabs, Tab, Dialog, DialogTitle, DialogContent, DialogActions, Divider, InputAdornment, Tooltip } from '@mui/material';
-import { PhotoCamera, VideoLibrary, Edit, Delete, Favorite, FavoriteBorder, Share, Comment, Search } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  List,
+  ListItem,
+  TextField,
+  Button,
+  Paper,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Avatar,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  IconButton,
+  Tabs,
+  Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
+  InputAdornment,
+  Tooltip,
+  Chip,
+} from "@mui/material";
+import {
+  PhotoCamera,
+  Delete,
+  Favorite,
+  FavoriteBorder,
+  Share,
+  Search,
+} from "@mui/icons-material";
+import { useTheme } from "@mui/material/styles";
+import axios from "axios";
+import { $user } from "store/user";
+import { useStore } from "@nanostores/react";
+import useAuth from "../../hooks/useAuth";
+import useBacklog from "../../hooks/useBacklog";
+import secureLocalStorage from "react-secure-storage";
+import jwtEncode from "jwt-encode";
+import profileImage from "assets/profile.jpeg";
+
+const newPostInitialState = {
+  title: "",
+  content: "",
+  videos: [],
+  images: [],
+  project: "",
+};
 
 const KnowledgeSharing = () => {
-  const userDetails = {
-    'Alice Johnson': { role: 'Senior Software Engineer', email: 'alice.johnson@elisa.fi' },
-    'Bob Smith': { role: 'UX Designer', email: 'bob.smith@elisa.fi' },
-    'Charlie Brown': { role: 'DevOps Engineer', email: 'charlie.brown@elisa.fi' },
-    'David Wilson': { role: 'Junior Developer', email: 'david.wilson@elisa.fi' },
-    'Melissa Test': { role: 'Software Developer', email: 'melissa.test@elisa.fi' }
-  };
-
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: 'Optimizing Code for Energy Efficiency',
-      content: 'Using efficient algorithms and data structures can significantly reduce the energy consumption of your applications.',
-      author: 'Alice Johnson',
-      project: 'Project A',
-      department: 'Engineering',
-      timestamp: '2023-10-01T10:00:00Z',
-      media: 'https://www.youtube.com/embed/yxU1TawzROI',
-      isEditable: false,
-      isFavorite: false,
-      comments: [{ id: 1, text: 'Great post!', author: 'Bob Smith', timestamp: '2023-10-01T11:00:00Z' }],
-      avatar: 'A'
-    },
-    {
-      id: 2,
-      title: 'Green Coding Practices',
-      content: 'Adopting practices like code reuse, modular design, and minimizing resource usage helps in creating sustainable software.',
-      author: 'Bob Smith',
-      project: 'Project B',
-      department: 'Design',
-      timestamp: '2023-10-02T11:30:00Z',
-      media: 'https://www.youtube.com/embed/bFyjzleofxs',
-      isEditable: false,
-      isFavorite: false,
-      comments: [{ id: 1, text: 'Very informative!', author: 'Alice Johnson', timestamp: '2023-10-02T12:00:00Z' }],
-      avatar: 'B'
-    },
-    {
-      id: 3,
-      title: 'Sustainable Development Workflow',
-      content: 'Implementing CI/CD pipelines that include energy profiling can help identify and reduce energy-intensive code paths.',
-      author: 'Charlie Brown',
-      project: 'Project A',
-      department: 'Engineering',
-      timestamp: '2023-10-03T09:15:00Z',
-      media: 'https://www.youtube.com/embed/erXQSQ8DH9Y',
-      isEditable: false,
-      isFavorite: false,
-      comments: [{ id: 1, text: 'Thanks for sharing!', author: 'Melissa Test', timestamp: '2023-10-03T10:00:00Z' }],
-      avatar: 'C'
-    },
-    {
-      id: 4,
-      title: 'Getting Started with Green Coding',
-      content: 'I\'m new to the concept of green coding and would love to learn more about it. What are some good resources or practices to get started? Any advice from experienced developers would be greatly appreciated!',
-      author: 'David Wilson',
-      project: 'Project C',
-      department: 'Engineering',
-      timestamp: '2023-10-04T14:30:00Z',
-      media: null,
-      isEditable: false,
-      isFavorite: false,
-      comments: [
-        { id: 1, text: 'I recommend starting with "Clean Code" by Robert C. Martin and then moving on to specific green coding practices.', author: 'Alice Johnson', timestamp: '2023-10-04T15:00:00Z' },
-        { id: 2, text: 'Check out the Green Software Foundation\'s resources. They have great documentation for beginners!', author: 'Bob Smith', timestamp: '2023-10-04T15:30:00Z' }
-      ],
-      avatar: 'D'
-    }
-  ]);
-
-  const [newPost, setNewPost] = useState({ title: '', content: '', author: 'Melissa Test', project: '', department: 'Engineering', media: null, avatar: 'M' });
-  const [filter, setFilter] = useState({ author: 'all', project: 'all', department: 'all' });
-  const [editingPost, setEditingPost] = useState(null);
+  const { authenticated } = useAuth();
+  const { userProjects, loading: backlogLoading } = useBacklog(
+    authenticated,
+    null
+  ); // Fetch existing projects
+  const [posts, setPosts] = useState([]);
+  const user = useStore($user);
+  const [video, setVideo] = useState("");
+  const [newPost, setNewPost] = useState({ ...newPostInitialState });
+  const [filter, setFilter] = useState({
+    author: "all",
+    project: "all",
+    department: "all",
+  });
   const [tabValue, setTabValue] = useState(0);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [newComment, setNewComment] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [newComment, setNewComment] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const theme = useTheme();
 
@@ -93,44 +85,137 @@ const KnowledgeSharing = () => {
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setNewPost({ ...newPost, media: URL.createObjectURL(file) });
+      setNewPost({
+        ...newPost,
+        images: [...newPost.images, URL.createObjectURL(file)],
+      });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newPost.title && newPost.content && newPost.project) {
-      const post = { id: posts.length + 1, ...newPost, timestamp: new Date().toISOString(), isEditable: true, isFavorite: false, comments: [] };
-      setPosts([...posts, post]);
-      setNewPost({ title: '', content: '', author: 'Melissa Test', project: '', department: 'Engineering', media: null, avatar: 'M' });
+
+    // validate required fields
+    if (!newPost.title || !newPost.content || !newPost.project) {
+      alert("Please fill in all required fields.");
+      return;
     }
+
+    const token = jwtEncode(
+      secureLocalStorage.getItem("session"),
+      process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+    );
+
+    await axios
+      .post(
+        // f-string to dynamically set the backend URL
+        `${
+          process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"
+        }/api/social`,
+        { ...newPost },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        const postId = response.data.postId;
+        const department = response.data.department || "IT";
+        setPosts([
+          ...posts,
+          {
+            ...newPost,
+            _id: postId,
+            uid: user.id,
+            timestamp: new Date().toISOString(),
+            comments: [],
+            pp: user.photo || profileImage,
+            name: user.name,
+            last_name: user.lastName,
+            department: department,
+          },
+        ]);
+        setNewPost({ ...newPostInitialState }); // Reset new post state
+      })
+      .catch((error) => {
+        console.error("Error creating post:", error);
+        alert("Error creating post. Please try again.");
+      });
+
+    /*;*/
   };
 
-  const handleEdit = (post) => {
-    if (post.isEditable && post.author === 'Melissa Test') {
-      setEditingPost(post);
-      setNewPost({ ...post });
-    }
+  const handleDelete = async (postId) => {
+    const token = jwtEncode(
+      secureLocalStorage.getItem("session"),
+      process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+    );
+    await axios
+      .delete(
+        // f-string to dynamically set the backend URL
+        `${
+          process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"
+        }/api/social/${postId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(() => {
+        setPosts(posts.filter((post) => post._id !== postId));
+      })
+      .catch((error) => {
+        console.error("Error deleting post:", error);
+        alert("Error deleting post. Please try again.");
+      });
   };
 
-  const handleUpdate = () => {
-    if (editingPost) {
-      const updatedPosts = posts.map(post => post.id === editingPost.id ? { ...newPost, id: post.id, timestamp: post.timestamp, isEditable: true } : post);
-      setPosts(updatedPosts);
-      setEditingPost(null);
-      setNewPost({ title: '', content: '', author: 'Melissa Test', project: '', department: 'Engineering', media: null, avatar: 'M' });
+  const handleFavorite = async (postId) => {
+    const token = jwtEncode(
+      secureLocalStorage.getItem("session"),
+      process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+    );
+    try {
+      const response = await axios
+        .post(
+          `${
+            process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"
+          }/api/social/like/${postId}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          const updatedPosts = posts.map((post) => {
+            if (post._id === postId) {
+              const isLiked = post.likes.some((like) => like.uid === user.id);
+              return {
+                ...post,
+                likes: isLiked
+                  ? post.likes.filter((like) => like.uid !== user.id)
+                  : [...post.likes, { uid: user.id }],
+                likesCount: isLiked
+                  ? post.likesCount - 1
+                  : (post.likesCount || 0) + 1,
+              };
+            }
+            return post;
+          });
+          setPosts(updatedPosts);
+          return response.data;
+        });
+    } catch (error) {
+      console.error("Error liking post:", error);
+      alert("Error liking post. Please try again.");
     }
-  };
-
-  const handleDelete = (postId) => {
-    const postToDelete = posts.find(post => post.id === postId);
-    if (postToDelete && postToDelete.isEditable && postToDelete.author === 'Melissa Test') {
-      setPosts(posts.filter(post => post.id !== postId));
-    }
-  };
-
-  const handleFavorite = (postId) => {
-    setPosts(posts.map(post => post.id === postId ? { ...post, isFavorite: !post.isFavorite } : post));
   };
 
   const handleShare = (post) => {
@@ -143,98 +228,186 @@ const KnowledgeSharing = () => {
   };
 
   const handleCopyLink = () => {
-    const link = `http://localhost:3000/knowledge-sharing/${selectedPost.id}`;
+    const link = `http://localhost:3000/knowledge-sharing/${selectedPost._id}`;
     navigator.clipboard.writeText(link);
-    alert('Link copied to clipboard!');
+    alert("Link copied to clipboard!");
   };
 
   const handleEmailShare = () => {
     const subject = `Check out this post: ${selectedPost.title}`;
     const body = `I thought you might be interested in this post: ${selectedPost.content}`;
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
   };
 
-  const handleAddComment = (postId) => {
+  const handleAddComment = async (postId) => {
     if (newComment.trim()) {
-      const updatedPosts = posts.map(post => {
-        if (post.id === postId) {
-          return {
-            ...post,
-            comments: [...post.comments, { id: post.comments.length + 1, text: newComment, author: 'Melissa Test', timestamp: new Date().toISOString() }]
-          };
-        }
-        return post;
-      });
-      setPosts(updatedPosts);
-      setNewComment('');
+      const token = jwtEncode(
+        secureLocalStorage.getItem("session"),
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+      );
+      await axios
+        .post(
+          // f-string to dynamically set the backend URL
+          `${
+            process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"
+          }/api/social/comment/${postId}`,
+          {
+            content: newComment,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          const updatedPosts = posts.map((post) => {
+            if (post._id === postId) {
+              return {
+                ...post,
+                comments: [
+                  ...post.comments,
+                  {
+                    _id: response.data.commentId,
+                    content: newComment,
+                    uid: user.id,
+                    name: user.name,
+                    last_name: user.lastName,
+                    department: response.data.department || "IT",
+                    email: user.email || "",
+                    pp:
+                      user.photo ||
+                      "https://upload.wikimedia.org/wikipedia/commons/8/83/Default-Icon.jpg",
+                    timestamp: new Date().toISOString(),
+                  },
+                ],
+              };
+            }
+            return post;
+          });
+          setPosts(updatedPosts);
+          setNewComment(""); // Clear the comment input
+        })
+        .catch((error) => {
+          console.error("Error adding comment:", error);
+          alert("Error adding comment. Please try again.");
+        });
     }
   };
 
-  const handleDeleteComment = (postId, commentId) => {
-    const updatedPosts = posts.map(post => {
-      if (post.id === postId) {
-        return {
-          ...post,
-          comments: post.comments.filter(comment => comment.id !== commentId)
-        };
-      }
-      return post;
-    });
-    setPosts(updatedPosts);
+  const handleDeleteComment = async (postId, commentId) => {
+    const token = jwtEncode(
+      secureLocalStorage.getItem("session"),
+      process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+    );
+    await axios
+      .delete(
+        // f-string to dynamically set the backend URL
+        `${
+          process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"
+        }/api/social/comment/${postId}/${commentId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(() => {
+        const updatedPosts = posts.map((post) => {
+          if (post._id === postId) {
+            return {
+              ...post,
+              comments: post.comments.filter(
+                (comment) => comment._id !== commentId
+              ),
+            };
+          }
+          return post;
+        });
+        setPosts(updatedPosts);
+      })
+      .catch((error) => {
+        console.error("Error deleting comment:", error);
+        alert("Error deleting comment. Please try again.");
+      });
+  };
+  const handleAddVideo = () => {
+    if (video.trim()) {
+      setNewPost((prevPost) => ({
+        ...prevPost,
+        videos: [...prevPost.videos, video],
+      }));
+      setVideo("");
+    }
   };
 
-  const filteredPosts = posts.filter(post => {
-    const matchesSearch = searchQuery === '' ||
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.author.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesSearch &&
-      (filter.author === 'all' || post.author === filter.author) &&
-      (filter.project === 'all' || post.project === filter.project) &&
-      (filter.department === 'all' || post.department === filter.department);
-  });
-
-  const myPosts = posts.filter(post => post.author === 'Melissa Test');
-  const likedPosts = posts.filter(post => post.isFavorite);
-
-  const handleEmailClick = (email) => {
-    window.location.href = `mailto:${email}`;
+  const handleDeleteVideo = (index) => {
+    setNewPost((prevPost) => ({
+      ...prevPost,
+      videos: prevPost.videos.filter((_, i) => i !== index),
+    }));
   };
 
-  const UserTooltip = ({ name }) => {
-    const details = userDetails[name];
+  const UserTooltip = ({ name, lastName, department, email }) => {
     return (
       <Box sx={{ p: 1 }}>
-        <Typography variant="subtitle2">{name}</Typography>
-        <Typography variant="body2" sx={{ mb: 1 }}>{details.role}</Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            color: '#2196f3',
-            cursor: 'pointer',
-            '&:hover': {
-              textDecoration: 'underline'
-            }
-          }}
-          onClick={() => handleEmailClick(details.email)}
-        >
-          {details.email}
+        <Typography variant="subtitle2">
+          {name} {lastName}
+        </Typography>
+
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Department: <b>{department}</b>
+        </Typography>
+
+        <Typography variant="body2" sx={{ mb: 1, color: "text.info" }}>
+          {email}
         </Typography>
       </Box>
     );
   };
 
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get(
+          // f-string to dynamically set the backend URL
+          `${
+            process.env.REACT_APP_BACKEND_URL || "http://localhost:3002"
+          }/api/social`
+        );
+        setPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+    fetchPosts();
+  }, []);
+
   return (
-    <Box sx={{ p: 3, maxWidth: '800px', margin: '0 auto' }}>
-      <Paper sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', borderRadius: '12px' }}>
-        <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }}>M</Avatar>
+    <Box sx={{ p: 3, maxWidth: "800px", margin: "0 auto" }}>
+      <Paper
+        sx={{
+          p: 2,
+          mb: 2,
+          display: "flex",
+          alignItems: "center",
+          borderRadius: "12px",
+        }}
+      >
+        <Avatar sx={{ mr: 2, bgcolor: "primary.main" }}>M</Avatar>
         <Typography variant="h6">Knowledge Sharing Feed</Typography>
       </Paper>
-      <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} sx={{ mb: 3 }}>
+      <Tabs
+        value={tabValue}
+        onChange={(e, newValue) => setTabValue(newValue)}
+        sx={{ mb: 3 }}
+      >
         <Tab label="All Posts" />
         <Tab label="My Posts" />
-        <Tab label="Liked Posts" />
       </Tabs>
       <Box sx={{ mb: 3 }}>
         <TextField
@@ -288,32 +461,59 @@ const KnowledgeSharing = () => {
             <Grid item xs={12} md={4}>
               <FormControl fullWidth margin="normal">
                 <InputLabel>Filter by Author</InputLabel>
-                <Select value={filter.author} onChange={(e) => setFilter({ ...filter, author: e.target.value })}>
+                <Select
+                  value={filter.author}
+                  onChange={(e) =>
+                    setFilter({ ...filter, author: e.target.value })
+                  }
+                >
                   <MenuItem value="all">All</MenuItem>
-                  {Array.from(new Set(posts.map(post => post.author))).map(author => (
-                    <MenuItem key={author} value={author}>{author}</MenuItem>
-                  ))}
+                  {Array.from(new Set(posts.map((post) => post.author))).map(
+                    (author) => (
+                      <MenuItem key={author} value={author}>
+                        {author}
+                      </MenuItem>
+                    )
+                  )}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={4}>
               <FormControl fullWidth margin="normal">
                 <InputLabel>Filter by Project</InputLabel>
-                <Select value={filter.project} onChange={(e) => setFilter({ ...filter, project: e.target.value })}>
+                <Select
+                  value={filter.project}
+                  onChange={(e) =>
+                    setFilter({ ...filter, project: e.target.value })
+                  }
+                >
                   <MenuItem value="all">All</MenuItem>
-                  {Array.from(new Set(posts.map(post => post.project))).map(project => (
-                    <MenuItem key={project} value={project}>{project}</MenuItem>
-                  ))}
+                  {Array.from(new Set(posts.map((post) => post.project))).map(
+                    (project) => (
+                      <MenuItem key={project} value={project}>
+                        {project}
+                      </MenuItem>
+                    )
+                  )}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={4}>
               <FormControl fullWidth margin="normal">
                 <InputLabel>Filter by Department</InputLabel>
-                <Select value={filter.department} onChange={(e) => setFilter({ ...filter, department: e.target.value })}>
+                <Select
+                  value={filter.department}
+                  onChange={(e) =>
+                    setFilter({ ...filter, department: e.target.value })
+                  }
+                >
                   <MenuItem value="all">All</MenuItem>
-                  {Array.from(new Set(posts.map(post => post.department))).map(department => (
-                    <MenuItem key={department} value={department}>{department}</MenuItem>
+                  {Array.from(
+                    new Set(posts.map((post) => post.department))
+                  ).map((department) => (
+                    <MenuItem key={department} value={department}>
+                      {department}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -322,81 +522,225 @@ const KnowledgeSharing = () => {
         )}
       </Box>
       <List>
-        {(tabValue === 0 ? filteredPosts : tabValue === 1 ? myPosts : likedPosts).map((post) => (
+        {posts.map((post) => (
           <ListItem key={post.id} sx={{ mb: 2 }}>
-            <Card sx={{ width: '100%', borderRadius: '12px', boxShadow: 2 }}>
+            <Card sx={{ width: "100%", borderRadius: "12px", boxShadow: 2 }}>
               <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }}>{post.avatar}</Avatar>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Box
+                    component="img"
+                    alt="profile"
+                    src={post.pp}
+                    height="42px"
+                    width="42px"
+                    borderRadius="50%"
+                    referrerPolicy="no-referrer"
+                    sx={{ objectFit: "cover", mr: 2 }}
+                  />
                   <Box>
                     <Typography variant="h6">{post.title}</Typography>
                     <Typography variant="body2" color="textSecondary">
-                      <Tooltip title={<UserTooltip name={post.author} />} arrow placement="top">
-                        <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>{post.author}</span>
+                      <Tooltip
+                        title={
+                          <UserTooltip
+                            name={post.name}
+                            department={post.department}
+                            lastName={post.last_name}
+                          />
+                        }
+                        arrow
+                        placement="top"
+                      >
+                        <span
+                          style={{
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {post.name} {post.last_name}
+                        </span>
                       </Tooltip>
-                      {' • '}{post.project} • {post.department} • {new Date(post.timestamp).toLocaleString()}
+                      {" • "}
+                      {post.project} • {post.department} •{" "}
+                      {
+                        // hide seconds
+                        new Date(post.timestamp).toLocaleDateString("es-MX", {
+                          year: "numeric",
+                          month: "numeric",
+                          day: "numeric",
+                        }) +
+                          " " +
+                          new Date(post.timestamp).toLocaleTimeString("es-MX", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                      }
                     </Typography>
                   </Box>
                 </Box>
-                <Typography variant="body1" sx={{ mt: 1, mb: 2 }}>{post.content}</Typography>
-                {post.media && (
-                  <Box sx={{ mb: 2 }}>
-                    <iframe
-                      width="100%"
-                      height="315"
-                      src={post.media}
-                      title="YouTube video player"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      style={{ borderRadius: '8px' }}
-                    />
-                  </Box>
-                )}
+                <Typography variant="body1" sx={{ mt: 1, mb: 2 }}>
+                  {post.content}
+                </Typography>
+                {post.videos.length > 0 &&
+                  post.videos.map((video, index) => (
+                    <Box sx={{ mb: 2 }} key={index}>
+                      <iframe
+                        width="100%"
+                        height="315"
+                        src={video}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        style={{ borderRadius: "8px" }}
+                      />
+                    </Box>
+                  ))}
+                {post.images.length > 0 &&
+                  post.images.map((image, index) => (
+                    <Box sx={{ mb: 2 }} key={index}>
+                      <CardMedia
+                        component="img"
+                        image={image}
+                        alt={`Post image ${index + 1}`}
+                        sx={{ borderRadius: "8px" }}
+                      />
+                    </Box>
+                  ))}
+
                 <Divider sx={{ my: 2 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconButton onClick={() => handleFavorite(post.id)}>
-                      {post.isFavorite ? <Favorite color="error" /> : <FavoriteBorder />}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton onClick={() => handleFavorite(post._id)}>
+                      {
+                        // check if uid is in likes array [{uid}]
+                        post.likes?.length > 0 &&
+                        post.likes.some((like) => like.uid === user.id) ? (
+                          <Favorite color="error" />
+                        ) : (
+                          <FavoriteBorder />
+                        )
+                      }
                     </IconButton>
-                    <IconButton onClick={() => handleShare(post)}><Share /></IconButton>
-                    {post.isEditable && post.author === 'Melissa Test' && (
+                    <Typography variant="body2" sx={{ mr: 0.5 }}>
+                      {post.likesCount || 0}
+                    </Typography>
+                    <IconButton onClick={() => handleShare(post)}>
+                      <Share />
+                    </IconButton>
+                    {post.uid == user.id && (
                       <>
-                        <IconButton onClick={() => handleEdit(post)}><Edit /></IconButton>
-                        <IconButton onClick={() => handleDelete(post.id)}><Delete /></IconButton>
+                        <IconButton onClick={() => handleDelete(post._id)}>
+                          <Delete />
+                        </IconButton>
                       </>
                     )}
                   </Box>
                 </Box>
                 <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle1" sx={{ mb: 1 }}>Comments</Typography>
-                  {post.comments.map(comment => (
-                    <Box key={comment.id} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                      <Avatar sx={{ mr: 1, width: 32, height: 32, fontSize: '0.875rem' }}>
-                        {comment.author.charAt(0)}
-                      </Avatar>
+                  <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                    Comments
+                  </Typography>
+                  {post.comments.map((comment) => (
+                    <Box
+                      key={comment._id}
+                      sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}
+                    >
+                      <Box
+                        component="img"
+                        alt="profile"
+                        src={comment.pp || profileImage}
+                        height="42px"
+                        width="42px"
+                        borderRadius="50%"
+                        referrerPolicy="no-referrer"
+                        sx={{ objectFit: "cover", mr: 2 }}
+                      />
                       <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Tooltip title={<UserTooltip name={comment.author} />} arrow placement="top">
-                            <Typography variant="subtitle2" sx={{ cursor: 'pointer', textDecoration: 'underline' }}>
-                              {comment.author}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Tooltip
+                            title={
+                              <UserTooltip
+                                name={comment.name}
+                                last_name={comment.last_name}
+                                department={comment.department}
+                                email={comment.email}
+                              />
+                            }
+                            arrow
+                            placement="top"
+                          >
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                cursor: "pointer",
+                                textDecoration: "underline",
+                              }}
+                            >
+                              {comment.name} {comment.last_name}
                             </Typography>
                           </Tooltip>
-                          {comment.author === 'Melissa Test' && (
-                            <IconButton size="small" onClick={() => handleDeleteComment(post.id, comment.id)}>
+                          {comment.uid === user.id && (
+                            <IconButton
+                              size="small"
+                              onClick={() =>
+                                handleDeleteComment(post._id, comment._id)
+                              }
+                            >
                               <Delete fontSize="small" />
                             </IconButton>
                           )}
                         </Box>
-                        <Typography variant="body2">{comment.text}</Typography>
+                        <Typography variant="body2">
+                          {comment.content}
+                        </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          {new Date(comment.timestamp).toLocaleString()}
+                          {
+                            // hide seconds
+                            new Date(comment.timestamp).toLocaleDateString(
+                              "es-MX",
+                              {
+                                year: "numeric",
+                                month: "numeric",
+                                day: "numeric",
+                              }
+                            ) +
+                              " " +
+                              new Date(comment.timestamp).toLocaleTimeString(
+                                "es-MX",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )
+                          }
                         </Typography>
                       </Box>
                     </Box>
                   ))}
-                  <Box sx={{ display: 'flex', mt: 2 }}>
-                    <Avatar sx={{ mr: 1, width: 32, height: 32, fontSize: '0.875rem' }}>M</Avatar>
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                    <Box
+                      component="img"
+                      alt="profile"
+                      src={user.photo || 'https://upload.wikimedia.org/wikipedia/commons/8/83/Default-Icon.jpg'}
+                      height="42px"
+                      width="52px"
+                      borderRadius="50%"
+                      referrerPolicy="no-referrer"
+                      sx={{ objectFit: "cover", mr: 2 }}
+                    />
                     <TextField
                       fullWidth
                       placeholder="Add a comment..."
@@ -439,7 +783,7 @@ const KnowledgeSharing = () => {
                     />
                     <Button
                       variant="contained"
-                      onClick={() => handleAddComment(post.id)}
+                      onClick={() => handleAddComment(post._id)}
                       disabled={!newComment.trim()}
                     >
                       Post
@@ -462,9 +806,11 @@ const KnowledgeSharing = () => {
           <Button onClick={handleCloseShareDialog}>Cancel</Button>
         </DialogActions>
       </Dialog>
-      <Paper sx={{ p: 2, mt: 2, borderRadius: '12px' }}>
-        <Typography variant="h6" gutterBottom>{editingPost ? 'Edit Post' : 'Add a New Post'}</Typography>
-        <form onSubmit={editingPost ? handleUpdate : handleSubmit}>
+      <Paper sx={{ p: 2, mt: 2, borderRadius: "12px" }}>
+        <Typography variant="h6" gutterBottom>
+          Add a New Post
+        </Typography>
+        <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
             label="Title"
@@ -483,15 +829,6 @@ const KnowledgeSharing = () => {
             multiline
             rows={4}
           />
-          <TextField
-            fullWidth
-            label="Author"
-            name="author"
-            value={newPost.author}
-            onChange={handleInputChange}
-            margin="normal"
-            disabled
-          />
           <FormControl fullWidth margin="normal">
             <InputLabel>Project</InputLabel>
             <Select
@@ -499,24 +836,17 @@ const KnowledgeSharing = () => {
               value={newPost.project}
               onChange={handleInputChange}
             >
-              <MenuItem value="Project A">Project A</MenuItem>
-              <MenuItem value="Project B">Project B</MenuItem>
-              <MenuItem value="Project C">Project C</MenuItem>
+              {userProjects.map((project) => (
+                <MenuItem key={project.key} value={project.projectName}>
+                  {project.projectName || "Unnamed Project"}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
-          <TextField
-            fullWidth
-            label="Department"
-            name="department"
-            value={newPost.department}
-            onChange={handleInputChange}
-            margin="normal"
-            disabled
-          />
-          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
             <input
-              accept="image/*,video/*"
-              style={{ display: 'none' }}
+              accept="image/*"
+              style={{ display: "none" }}
               id="media-upload"
               type="file"
               onChange={handleMediaChange}
@@ -527,14 +857,70 @@ const KnowledgeSharing = () => {
               </IconButton>
             </label>
             <Typography variant="body2" sx={{ ml: 1 }}>
-              {newPost.media ? 'Media uploaded' : 'Upload media'}
+              {newPost.images.length > 0 ? "Media uploaded" : "Upload media"}
             </Typography>
+
+            {/* display thumbnail */}
           </Box>
-          <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>{editingPost ? 'Update' : 'Submit'}</Button>
+          {newPost.images.length > 0 && (
+            <Box sx={{ display: "flex", mt: 3, gap: 1 }}>
+              {newPost.images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Uploaded thumbnail ${index}`}
+                  style={{
+                    width: "100px",
+                    objectFit: "contain",
+                    borderRadius: "4px",
+                    mr: 1,
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+          {/* box for youtube list video */}
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="YouTube Video URL"
+              name="video"
+              value={video}
+              onChange={(e) => setVideo(e.target.value)}
+              margin="normal"
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddVideo}
+              sx={{ mt: 2 }}
+            >
+              Add Video
+            </Button>
+            <Box sx={{ mt: 2 }}>
+              {newPost.videos.map((vid, index) => (
+                <Chip
+                  key={index}
+                  label={vid}
+                  onDelete={() => handleDeleteVideo(index)}
+                  sx={{ mr: 1 }}
+                />
+              ))}
+            </Box>
+          </Box>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+          >
+            Submit
+          </Button>
         </form>
       </Paper>
     </Box>
   );
 };
 
-export default KnowledgeSharing; 
+export default KnowledgeSharing;

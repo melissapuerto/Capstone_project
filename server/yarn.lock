@@ -467,7 +467,7 @@ glob-parent@~5.1.2:
 
 global@^4.4.0:
   version "4.4.0"
-  resolved "https://registry.yarnpkg.com/global/-/global-4.4.0.tgz#3e7b105179006a323ed71aafca3e9c57a5cc6406"
+  resolved "https://registry.npmjs.org/global/-/global-4.4.0.tgz"
   integrity sha512-wv/LAoHdRE3BeTGz53FAamhGlPLhlssK45usmGFThIi4XqnBmjKQ16u+RNbP7WvigRZDxUsM0J3gcQ5yicaL0w==
   dependencies:
     min-document "^2.19.0"
@@ -558,6 +558,11 @@ is-number@^7.0.0:
   version "7.0.0"
   resolved "https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz"
   integrity sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==
+
+jwt-decode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/jwt-decode/-/jwt-decode-4.0.0.tgz"
+  integrity sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==
 
 jwt-encode@^1.0.1:
   version "1.0.1"
@@ -1079,5 +1084,5 @@ webidl-conversions@^7.0.0:
 
 win-node-env@^0.6.1:
   version "0.6.1"
-  resolved "https://registry.yarnpkg.com/win-node-env/-/win-node-env-0.6.1.tgz#6684e136ec064aa4d47093899b13d4027ed2778b"
+  resolved "https://registry.npmjs.org/win-node-env/-/win-node-env-0.6.1.tgz"
   integrity sha512-oR+MLQ6jdvwqkLEkKBYxRvBOYbTlQV9dJKn8vLzjA4HCzcqdlCE6H1oOvA7lAdCgNXiOX0xfjl/Y47ZcZN6FDA==

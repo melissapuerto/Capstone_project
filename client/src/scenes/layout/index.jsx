@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { Navbar, Sidebar } from "components";
 import { useGetUserQuery } from "state/api";
 import Footer from "../../components/Footer";
+import Chatbot from "../../components/Chatbot";
 
 // Layout
 const Layout = () => {
@@ -39,6 +40,7 @@ const Layout = () => {
         <Outlet />
         <Footer />
       </Box>
+      <Chatbot />
     </Box>
   );
 };

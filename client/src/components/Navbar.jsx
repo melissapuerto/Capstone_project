@@ -17,10 +17,8 @@ import {
   LightModeOutlined,
   DarkModeOutlined,
   Menu as MenuIcon,
-  Search,
   SettingsOutlined,
   ArrowDropDownOutlined,
-  GitHub,
   Timer,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +26,6 @@ import { resetUser, $user } from "store/user";
 import { useStore } from "@nanostores/react";
 import secureLocalStorage from "react-secure-storage";
 import { FlexBetween } from ".";
-import profileImage from "assets/profile.jpeg";
 import FocusMode from "./FocusMode";
 
 // Navbar
@@ -203,11 +200,12 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                   component="img"
                   alt="profile"
                   src={
-                    usr.photo ? usr.photo : profileImage
+                    usr.photo ? usr.photo : 'https://upload.wikimedia.org/wikipedia/commons/8/83/Default-Icon.jpg'
                   }
                   height="32px"
                   width="32px"
                   borderRadius="50%"
+                  referrerPolicy="no-referrer"
                   sx={{ objectFit: "cover" }}
                 />
                 <Box textAlign="left">

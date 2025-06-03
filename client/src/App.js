@@ -25,6 +25,7 @@ import { useStore } from "@nanostores/react";
 import ProtectedRoute from "ProtectedRoutes";
 import axios from "axios";
 
+
 function App() {
   const mode = useSelector((state) => state.global.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
