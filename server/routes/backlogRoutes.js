@@ -113,9 +113,11 @@ router.get("/", async (req, res) => {
     let startAt = 0;
     const maxResults = 50;
     let hasMore = true;
+    const MAX_ISSUES = 500; // Cap to avoid memory bloat
+    let fetchedCount = 0;
 
     // Fetch all pages of issues
-    while (hasMore) {
+    while (hasMore && allIssues.length < MAX_ISSUES) {
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -135,10 +137,16 @@ router.get("/", async (req, res) => {
       }
 
       const issues = response.data.issues;
-      allIssues = [...allIssues, ...issues];
+      allIssues.push(...issues);
+      fetchedCount += issues.length;
+
+      // Log progress every 100 issues
+      if (fetchedCount % 100 === 0) {
+        console.log(`Fetched ${fetchedCount} issues so far...`);
+      }
 
       // Check if there are more issues to fetch
-      hasMore = response.data.startAt + response.data.maxResults < response.data.total;
+      hasMore = response.data.startAt + response.data.maxResults < response.data.total && allIssues.length < MAX_ISSUES;
       startAt += maxResults;
     }
 

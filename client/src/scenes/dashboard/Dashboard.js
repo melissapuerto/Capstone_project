@@ -34,14 +34,13 @@ const Dashboard = () => {
     );
 
     // Deduplicate tasks by id
-    const uniqueTasks = [];
-    const seenIds = new Set();
-    for (const item of allTasks) {
-      if (!seenIds.has(item.id)) {
-        seenIds.add(item.id);
-        uniqueTasks.push(item);
+    const uniqueTasks = allTasks.reduce((acc, item) => {
+      if (!acc.seen.has(item.id)) {
+        acc.seen.add(item.id);
+        acc.tasks.push(item);
       }
-    }
+      return acc;
+    }, { seen: new Set(), tasks: [] }).tasks;
 
     // Total story points across all projects
     const totalStoryPoints = uniqueTasks.reduce((total, item) => {

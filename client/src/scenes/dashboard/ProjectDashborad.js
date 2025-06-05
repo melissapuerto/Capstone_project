@@ -32,14 +32,13 @@ const ProjectDashboard = ({ projectKey }) => {
         if (!selectedProject?.sustainabilityBacklog) return {};
 
         // Deduplicate tasks by id
-        const uniqueTasks = [];
-        const seenIds = new Set();
-        for (const item of selectedProject.sustainabilityBacklog) {
-            if (!seenIds.has(item.id)) {
-                seenIds.add(item.id);
-                uniqueTasks.push(item);
+        const uniqueTasks = selectedProject.sustainabilityBacklog.reduce((acc, item) => {
+            if (!acc.seen.has(item.id)) {
+                acc.seen.add(item.id);
+                acc.tasks.push(item);
             }
-        }
+            return acc;
+        }, { seen: new Set(), tasks: [] }).tasks;
 
         // Total story points
         const totalStoryPoints = uniqueTasks.reduce((total, item) => {

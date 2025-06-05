@@ -14,8 +14,8 @@ import { useNavigate } from 'react-router-dom';
 function SustainabilityBacklog({ projectKey }) {
     const theme = useTheme();
     const navigate = useNavigate();
-    const { authenticated, loading, apiError, handleLogin, handleLogout } = useAuth();
-    const { backlog, setBacklog, error, setError, loading: backlogLoading, selectedProject } = useBacklog(authenticated, projectKey);
+    const { authenticated, isGuest, loading: authLoading, apiError, handleLogin, handleLogout } = useAuth();
+    const { userProjects, loading: backlogLoading, backlog, setBacklog, error, setError, selectedProject } = useBacklog(authenticated || isGuest, projectKey);
     console.log("backlog", backlog);
     const {
         sustainabilityBacklog,
@@ -79,7 +79,7 @@ function SustainabilityBacklog({ projectKey }) {
         return notInSustainabilityBacklog && noSustainability;
     });
 
-    if (loading || backlogLoading) {
+    if (authLoading || backlogLoading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
                 <Typography>Loading...</Typography>
@@ -87,29 +87,47 @@ function SustainabilityBacklog({ projectKey }) {
         );
     }
 
-    if (!authenticated || apiError || error) {
+    if (!authenticated && !isGuest || apiError || error) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" flexDirection="column" gap={2}>
                 <Typography variant="h5" color="text.secondary">
-                    Please log into JIRA to view the sustainability backlog
+                    Please log in or continue as guest to view the sustainability backlog
                 </Typography>
-                <Button
-                    onClick={handleLogin}
-                    sx={{
-                        backgroundColor: theme.palette.secondary.light,
-                        color: theme.palette.background.alt,
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        padding: "10px 20px",
-                        "&:hover": {
-                            backgroundColor: theme.palette.background.alt,
-                            color: theme.palette.secondary.light,
-                        },
-                    }}
-                    startIcon={<LoginIcon />}
-                >
-                    Login
-                </Button>
+                <Box display="flex" gap={2}>
+                    <Button
+                        onClick={handleLogin}
+                        sx={{
+                            backgroundColor: theme.palette.secondary.light,
+                            color: theme.palette.background.alt,
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            padding: "10px 20px",
+                            "&:hover": {
+                                backgroundColor: theme.palette.background.alt,
+                                color: theme.palette.secondary.light,
+                            },
+                        }}
+                        startIcon={<LoginIcon />}
+                    >
+                        Login
+                    </Button>
+                    <Button
+                        onClick={() => navigate('/')}
+                        sx={{
+                            backgroundColor: theme.palette.primary.light,
+                            color: theme.palette.background.alt,
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            padding: "10px 20px",
+                            "&:hover": {
+                                backgroundColor: theme.palette.background.alt,
+                                color: theme.palette.primary.light,
+                            },
+                        }}
+                    >
+                        Continue as Guest
+                    </Button>
+                </Box>
             </Box>
         );
     }

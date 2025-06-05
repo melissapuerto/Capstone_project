@@ -6,6 +6,7 @@ import secureLocalStorage from "react-secure-storage";
 import { useSearchParams } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import useAuth from "../../hooks/useAuth";
 import "./styles.css";
 
 const BACKEND_URL =
@@ -27,6 +28,7 @@ const AuthScreen = () => {
   const user = useStore($user);
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const { handleGuestAccess } = useAuth();
 
   useEffect(() => {
     if (token) {
@@ -173,7 +175,7 @@ const AuthScreen = () => {
           </p>
         </div>
 
-        {/* Formulario */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6 w-full">
           {/* Campo de nombre (solo en registro) */}
           {!isLogin && (
@@ -306,7 +308,7 @@ const AuthScreen = () => {
             </div>
           )}
 
-          {/* Botón de envío */}
+          {/* Buttons */}
           <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
             <button
               type="submit"
@@ -329,11 +331,13 @@ const AuthScreen = () => {
             >
               {submitted ? "Success" : <span>{isLogin ? "Log In" : "Sign Up"}</span>}
             </button>
+
             <div style={{ display: 'flex', alignItems: 'center', margin: '4px 0' }}>
               <div style={{ flex: 1, height: 1, background: '#d1d5db' }} />
               <span style={{ margin: '0 12px', color: '#6b7280', fontWeight: 600 }}>OR</span>
               <div style={{ flex: 1, height: 1, background: '#d1d5db' }} />
             </div>
+
             <button
               type="button"
               onClick={handleGoogleSignIn}
@@ -363,10 +367,38 @@ const AuthScreen = () => {
               />
               <span>Continue with Google</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                handleGuestAccess();
+                navigate('/dashboard');
+              }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                padding: '12px',
+                borderRadius: '9999px',
+                background: '#f3f4f6',
+                color: '#374151',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                border: '1px solid #e5e7eb',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+              }}
+              onMouseOver={e => { e.currentTarget.style.background = '#e5e7eb'; }}
+              onMouseOut={e => { e.currentTarget.style.background = '#f3f4f6'; }}
+            >
+              <span>Continue as Guest</span>
+            </button>
           </div>
         </form>
 
-        {/* Alternar entre inicio de sesión y registro */}
+        {/* Toggle between login and signup */}
         <div className="text-center">
           <button
             type="button"

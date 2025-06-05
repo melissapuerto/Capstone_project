@@ -19,27 +19,21 @@ const app = express();
 
 app.set('trust proxy', 1);
 
-// CORS setup
+// CORS configuration
 const allowedOrigins = [
-    process.env.FRONTEND_URL, // https://capstone-project-tan-gamma.vercel.app
-    'http://localhost:3000', // For local testing
-    'http://localhost:3001', // For local testing
-    'http://localhost:3002', // For local testing
-    'http://localhost:3003', // For local testing
+  'http://localhost:3000',
+  'https://your-frontend-url.vercel.app'
 ];
 
 app.use(cors({
-    origin: (origin, callback) => {
-        console.log('Request Origin:', origin);
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, origin);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 
 // Middleware

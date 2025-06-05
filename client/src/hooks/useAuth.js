@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const useAuth = () => {
     const [authenticated, setAuthenticated] = useState(false);
+    const [isGuest, setIsGuest] = useState(false);
     const [loading, setLoading] = useState(true);
     const [apiError, setApiError] = useState(false);
 
@@ -29,16 +30,24 @@ const useAuth = () => {
         window.location.href = `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/auth/atlassian`;
     };
 
+    const handleGuestAccess = () => {
+        setIsGuest(true);
+        setAuthenticated(true); // Allow access to protected routes
+    };
+
     const handleLogout = async () => {
         try {
-            await axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/auth/logout`, { withCredentials: true });
+            if (!isGuest) {
+                await axios.get(`${process.env.REACT_APP_BACKEND_URL || "http://localhost:3001"}/auth/logout`, { withCredentials: true });
+            }
             setAuthenticated(false);
+            setIsGuest(false);
         } catch (err) {
             console.error('Error logging out:', err);
         }
     };
 
-    return { authenticated, loading, apiError, handleLogin, handleLogout };
+    return { authenticated, isGuest, loading, apiError, handleLogin, handleLogout, handleGuestAccess };
 };
 
 export default useAuth;
